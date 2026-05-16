@@ -1,1 +1,52 @@
+@media (max-width: 768px) {
+    .nav-inner {
+        position: relative;
+    }
+    .menu-toggle {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+    }
+    .menu-toggle span {
+        width: 25px;
+        height: 3px;
+        background: var(--gold);
+        transition: 0.3s;
+    }
+    /* تحويل المنيو إلى قائمة منسدلة عمودية في الموبايل */
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--ink);
+        flex-direction: column;
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    .nav-links.open {
+        display: flex;
+    }
+    .topbar-inner {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .ticker-wrap {
+        width: 100%;
+    }
+    .hub-wrapper, .library-grid {
+        grid-template-columns: 1fr;
+    }
+    .glow-title {
+        font-size: 2rem;
+    }
+}
+
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none;
+    }
+}
 
