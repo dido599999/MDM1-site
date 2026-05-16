@@ -1,192 +1,222 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>MDm1 — السيادة الرقمية | MDM1 Global Hub</title>
-    <meta name="description" content="أول منظومة مالية سيادية متوافقة مع الشريعة على Polygon — MDM1 Protocol."/>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cairo:wght@300;400;700;900&family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MDm1 — السيادة الرقمية | MDM1 Global Hub</title>
+<meta name="description" content="أول منظومة مالية سيادية متوافقة مع الشريعة على Polygon — MDM1 Protocol."/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cairo:wght@300;400;700;900&family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-
-    <canvas id="bg"></canvas>
-
-    <div class="topbar">
-        <div class="topbar-inner">
-            <div class="ticker-wrap">
-                <div class="ticker-track">
-                    <span id="livePrice">🔄 جاري تحميل سعر MDM1 المباشر...</span>
-                    <span>📜 بروتوكول مالي سيادي مشفر غير مركزي</span>
-                    <span>🕌 متوافق مع أحكام المعاملات المالية الإسلامية</span>
-                    <span>⚡ مبني على شبكة Polygon المتطورة</span>
-                </div>
-            </div>
-            <div class="shares">
-                <a href="#" title="تويتر"><svg viewBox="0 0 24 24"><path d="M18.2 2.4h3.3l-7.2 8.2 8.5 11h-6.6l-5.2-6.8-5.9 6.8H1.3l7.7-8.8L0.9 2.4h6.8l4.7 6.2 5.8-6.2zm-1.2 17.1h1.8L7.1 4.2H5.1l11.9 15.3z"/></svg></a>
-                <a href="#" title="تلغرام"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 7.2l-1.6 7.4c-.1.5-.4.6-.8.4l-2.4-1.8-1.2 1.1c-.1.1-.3.2-.4.2l.2-2.5 4.5-4.1c.2-.2-.04-.3-.3-.1l-5.5 3.5-2.4-.8c-.5-.2-.5-.5.1-.7l9.4-3.6c.4-.2.8.1.6.7z"/></svg></a>
-            </div>
-        </div>
-    </div>
-
-    <nav class="navbar">
-        <div class="nav-inner">
-            <a href="index.html" class="logo-wrap">
-                <img src="assets/images/coin-mdm1.webp" alt="MDM1 Logo" class="logo-img">
-                <span class="logo-text">MDM1 <small>Protocol</small></span>
-            </a>
-            <div class="menu-toggle" id="menuToggle">
-                <span></span><span></span><span></span>
-            </div>
-            <div class="nav-links" id="navLinks">
-                <a href="#mystic" class="nav-item active">الرؤية الأزلية</a>
-                <a href="#hub" class="nav-item">بوابة المبادلة</a>
-                <a href="#library" class="nav-item">المكتبة والمعرفة</a>
-                <a href="#roadmap" class="nav-item">خارطة الطريق</a>
-                <a href="whitepaper.html" class="nav-item spec-link">الورقة البيضاء 📜</a>
-            </div>
-        </div>
-    </nav>
-
-    <main class="main-content">
-        <section id="mystic" class="page active">
-            <div class="hero">
-                <div class="intro-eye">
-                    <img src="assets/images/eye-coin.webp" alt="The Sovereign Eye">
-                </div>
-                <h1 class="glow-title">السيادة الرقمية المطلقة</h1>
-                <p class="hero-subtitle">دمج التقنية المشفرة السيادية بالأصول الحقيقية وفق هندسة مالية متوافقة مع الشريعة الإسلامية.</p>
-                <div class="hero-btns">
-                    <a href="#hub" class="btn btn-gold">ولوج المنظومة المالية</a>
-                    <a href="whitepaper.html" class="btn btn-outline">مستند الرؤية الفنية</a>
-                </div>
-            </div>
-            
-            <div class="grid-container">
-                <div class="mystic-card">
-                    <img src="assets/images/temple.webp" alt="Temple" class="card-bg">
-                    <div class="card-content">
-                        <h3>قبو الأصول السيادية</h3>
-                        <p>تأمين المدخرات عبر عقود ذكية غير قابلة للاختراق أو التجميد.</p>
-                    </div>
-                </div>
-                <div class="mystic-card">
-                    <img src="assets/images/battle.webp" alt="Battle" class="card-bg">
-                    <div class="card-content">
-                        <h3>تحطيم الهيمنة الربوية</h3>
-                        <p>تأسيس نظام مالي نقي يعتمد على التبادل الفعلي والمنفعة الحقيقية.</p>
-                    </div>
-                </div>
-                <div class="mystic-card">
-                    <img src="assets/images/pyramid.webp" alt="Pyramid" class="card-bg">
-                    <div class="card-content">
-                        <h3>الهندسة المستدامة</h3>
-                        <p>خوارزميات موازنة رياضية تمنع التضخم المفتعل وتضمن التدفق العادل.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="hub" class="page">
-            <div class="section-header">
-                <h2>بوابة التبادل والسيادة</h2>
-                <p>إدارة أصولك الذكية مباشرة على شبكة Polygon</p>
-            </div>
-            <div class="hub-wrapper">
-                <div class="swap-box">
-                    <h3>المبادلة الفورية</h3>
-                    <div class="input-group">
-                        <label>تدفع (USDT)</label>
-                        <input type="number" id="swapInput" placeholder="0.0">
-                    </div>
-                    <div class="input-group">
-                        <label>تستلم (MDM1)</label>
-                        <input type="number" id="swapOutput" placeholder="0.0" readonly>
-                    </div>
-                    <button class="btn btn-gold btn-block" id="btnConnect">ربط المحفظة الرقمية</button>
-                </div>
-                
-                <div class="info-box">
-                    <h3>بيانات المنظومة</h3>
-                    <div class="contract-box">
-                        <span>عنوان العقد الذكي:</span>
-                        <code id="contractAddress">0x9b7a...ff212d4af37</code>
-                        <button class="btn-copy" onclick="copyContract()">نسخ</button>
-                    </div>
-                    <ul class="data-list">
-                        <li><span>الشبكة الأساسية:</span> <strong>Polygon POS</strong></li>
-                        <li><span>رمز الأصول:</span> <strong>MDM1</strong></li>
-                        <li><span>الغطاء المالي:</span> <strong>مضمون بأصول حقيقية 100%</strong></li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section id="library" class="page">
-            <div class="section-header">
-                <h2>مكتبة المعرفة والتوثيق</h2>
-                <p>اقرأ المستندات الشرعية والفنية للمشروع</p>
-            </div>
-            <div class="library-grid">
-                <div class="lib-card">
-                    <img src="assets/images/token-dark.webp" alt="Tokenomics">
-                    <h4>مستندات الاقتصاد الرقمي (Tokenomics)</h4>
-                    <a href="#" class="lib-link">تحميل المستند PDF</a>
-                </div>
-                <div class="lib-card">
-                    <img src="assets/images/coin-islamic.webp" alt="Sharia">
-                    <h4>التقرير والفتوى الشرعية للمنظومة</h4>
-                    <a href="docs/whitepaper.pdf" class="lib-link" target="_blank">معاينة الفتوى</a>
-                </div>
-            </div>
-        </section>
-
-        <section id="roadmap" class="page">
-            <div class="section-header">
-                <h2>مراحل التمكين والانتشار</h2>
-                <p>خارطة الطريق الاستراتيجية لمنظومة MDM1</p>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="time-dot"></div>
-                    <div class="time-content">
-                        <h4>المرحلة الأولى: التأسيس والنشأة</h4>
-                        <p>إطلاق العقود الذكية التدقيق الأمني الشرعي والفني المستقل.</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="time-dot"></div>
-                    <div class="time-content">
-                        <h4>المرحلة الثانية: بناء السيولة السيادية</h4>
-                        <p>تفعيل بوابات المبادلة وربط البروتوكول بأصول الذهب والمعادن النفيسة.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div class="ai-widget">
-        <button class="ai-toggle-btn" id="aiToggle" title="مساعد MDM1 الذكي">👁️‍🗨️</button>
-        <div class="ai-chatbox" id="aiChatbox">
-            <div class="chat-header">المستشار المالي الآلي لـ MDM1</div>
-            <div class="chat-logs" id="chatLogs">
-                <div class="msg bot">مرحباً بك في فضاء السيادة الرقمية. كيف يمكنني مساعدتك اليوم بخصوص البروتوكول؟</div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="chatInput" placeholder="اسأل عن توافق الشريعة، العقود، أو الشراء...">
-                <button id="chatSend">إرسال</button>
-            </div>
-        </div>
-    </div>
-
-    <footer class="footer">
-        <p>© 2026 جميع الحقوق محفوظة لمنظومة MDM1 Global Hub. السيادة المالية المطلقة.</p>
-    </footer>
-
-    <script src="assets/js/app.js"></script>
-    <script src="assets/js/ui.js"></script>
+<canvas id="bg"></canvas>
+<div class="hiero" style="left:4%;animation-delay:0s">𓂀</div>
+<div class="hiero" style="left:19%;animation-delay:3.5s">𓋹</div>
+<div class="hiero" style="left:40%;animation-delay:7s">𓆣</div>
+<div class="hiero" style="left:60%;animation-delay:10s">𓁈</div>
+<div class="hiero" style="left:80%;animation-delay:13s">☥</div>
+<div class="hiero" style="left:91%;animation-delay:5s">𓂀</div>
+<div id="intro"><div class="intro-eye"><img src="assets/images/eye-coin.jpg" alt="MDm1"/></div><div class="intro-logo">MDm1</div><div class="intro-sub">وَرَاءَ الْحِجَاب · THE SOVEREIGN ENTITY</div><div class="intro-bar"></div><button class="intro-skip" onclick="skipIntro()">تخطى ←</button></div>
+<div id="topbar">
+  <div class="clock" id="clk">🕒 ...</div>
+  <div class="shares">شارك:
+    <a href="https://twitter.com/intent/tweet?text=MDM1+Protocol&url=https://mdm1.org" target="_blank">𝕏 تويتر</a>|
+    <a href="https://t.me/share/url?url=https://mdm1.org" target="_blank">📱 تيليجرام</a>|
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https://mdm1.org" target="_blank">📘 فيسبوك</a>
+  </div>
+</div>
+<nav>
+  <button class="logo-wrap" onclick="location.href='/'">
+    <img src="assets/images/coin-mdm1.jpg" alt="MDM1"/>
+    <span>MDM1</span>
+  </button>
+  <button class="menu-toggle" id="navToggle" aria-label="قائمة">☰</button>
+  <ul class="nav-menu" id="navMenu">
+    <li class="nav-item"><button class="nav-link" onclick="showPage('mystic')">وراء الحجاب</button></li>
+    <li class="nav-item" id="dd1">
+      <button class="nav-link" onclick="toggleDD('dd1')">المكتبة ▾</button>
+      <div class="dropdown">
+        <a href="pages/learn.html" class="drop-item">المكتبة التعليمية</a>
+        <a href="pages/transparency.html" class="drop-item">الشفافية</a>
+        <a href="#dev" class="drop-item" onclick="showPage('hub');closeDD()">مركز المطورين</a>
+      </div>
+    </li>
+    <li class="nav-item" id="dd2">
+      <button class="nav-link" onclick="toggleDD('dd2')">الأكاديمية الشرعية ▾</button>
+      <div class="dropdown">
+        <a href="#shariah" class="drop-item" onclick="showPage('hub');closeDD()">المبادئ الشرعية</a>
+        <a href="#faq" class="drop-item" onclick="showPage('hub');closeDD()">الأسئلة الشائعة</a>
+      </div>
+    </li>
+    <li class="nav-item" id="dd3">
+      <button class="nav-link" onclick="toggleDD('dd3')">المعرض ▾</button>
+      <div class="dropdown">
+        <a href="#gallery" class="drop-item" onclick="showPage('hub');closeDD()">الهوية البصرية</a>
+        <a href="#participation" class="drop-item" onclick="showPage('hub');closeDD()">المشاركة</a>
+      </div>
+    </li>
+    <li class="nav-item" style="margin-right:10px">
+      <button onclick="connectWallet()" class="btn-gold" style="padding:9px 18px;font-size:.83rem;">📱 ربط المحفظة</button>
+    </li>
+  </ul>
+</nav>
+<div id="page-mystic" class="page active">
+<section class="msec" id="s1">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 50% 100%,#140900,#000 65%);"></div>
+<div class="msec-ov" style="background:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,.2));"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">I — Genesis · البدء</span>
+  <h1 class="mtitle g-gold">في البدء كان الصمت</h1>
+  <div class="mdiv"></div>
+  <p class="mbody">قبل أن تُرسم الحدود بين الليل والنهار...<br>قبل أن يُسمَّى الشيء باسمه...<br>كانت هناك <span class="g-gold">حقيقة واحدة</span> تسري في عروق الوجود.<br><br>ومن تلك الحقيقة وُلد <span class="g-gold">MDm1</span>:<br>ليس مجرد رمز — بل كيان حي يتنفس على البلوكشين.</p>
+  <div class="mcoin"><img src="assets/images/coin-mdm1.jpg" alt="MDm1 Coin"/></div>
+  <div class="arch-row">
+    <div class="arch"><div class="aico">🌙</div><div class="aname">الهلال</div></div>
+    <div class="arch"><div class="aico">👁️</div><div class="aname">البصيرة</div></div>
+    <div class="arch"><div class="aico">🪲</div><div class="aname">البعث</div></div>
+    <div class="arch"><div class="aico">🔺</div><div class="aname">الأزل</div></div>
+  </div>
+</div>
+</section>
+<div class="msep">⚜️</div>
+<section class="msec" id="s2">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 30% 50%,#1a0d00,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">II — The Bearer · الحامل</span>
+  <h2 class="mtitle g-gold">من يحمل الأمانة</h2>
+  <div class="mdiv"></div>
+  <p class="mbody">في كل حقبة يظهر من يحمل المشعل...<br>لا بالكلام بل بالفعل،<br>لا بالادعاء بل بالأثر الذي يتركه.<br><br>عينه تخترق الحجب، وقلبه مرآة <span class="g-gold">لا تكذب</span>.</p>
+  <div class="img-scene"><img src="assets/images/temple.jpg" alt="معبد الكيان"/></div>
+  <div class="mgrid">
+    <div class="mcard mc-light reveal"><h3 class="g-gold">👁️ عين حورس</h3><p>رمز البصيرة الكاملة — يرى ما لا تراه العيون العادية.</p></div>
+    <div class="mcard mc-light reveal"><h3 class="g-gold">🦅 الصقر الحر</h3><p>الروح التي لا تُقيَّد — تحلّق فوق كل القيود.</p></div>
+    <div class="mcard mc-light reveal"><h3 class="g-gold">🪲 الجعران</h3><p>رمز التجدد الأبدي — النهاية دائماً بداية جديدة.</p></div>
+  </div>
+</div>
+</section>
+<div class="msep" style="color:#ff5050">🔥</div>
+<section class="msec" id="s3">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 70% 40%,#1a0000,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">III — The Other Face · الوجه الآخر</span>
+  <h2 class="mtitle g-red">من يعكس النور</h2>
+  <div class="mdiv" style="background:linear-gradient(90deg,transparent,var(--red),transparent);"></div>
+  <p class="mbody">ليس الظلام يأتي بلا وجه...<br>بل يلبس نصف نور ليبدو أكثر إغراءً.<br><br><span class="g-red">نصف حقيقة أخطر من كذبة كاملة.</span></p>
+  <div class="img-scene" style="border-color:rgba(180,20,20,0.3)"><img src="assets/images/battle.jpg" alt="صراع الحق والباطل"/></div>
+  <div class="shadow-box reveal">
+    <p>يمتلك بريقاً يشبه الذهب، ويحمل كلاماً يشبه الحكمة...<br>لكن ظلاله تسير في الاتجاه الخطأ.<br><br>علامته الأولى: <span class="g-red">يعدك بكل شيء</span>، ولا يُسأل عمّا يأخذ.</p>
+  </div>
+  <div class="mgrid">
+    <div class="mcard mc-dark reveal"><h3 class="g-red">🪞 الانعكاس</h3><p>الزيف لا يُبتكر من العدم — نسخة مشوّهة مما هو حقيقي.</p></div>
+    <div class="mcard mc-dark reveal"><h3 class="g-red">🎭 القناع</h3><p>الخطر الأكبر من يُقنعك أن شرّه خير.</p></div>
+    <div class="mcard mc-dark reveal"><h3 class="g-red">⚡ الفتنة الرقمية</h3><p>في عصر البيانات، أكثر الحقائق زيفاً تحصل على أكثر النقرات.</p></div>
+  </div>
+</div>
+</section>
+<div class="msep" style="color:#9b7aff">🌌</div>
+<section class="msec" id="s4">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 50% 50%,#0d0a1a,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">IV — The Confrontation · المواجهة</span>
+  <h2 class="mtitle" style="background:linear-gradient(135deg,var(--gold2),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">لقاء النقيضين</h2>
+  <div class="mdiv"></div>
+  <div class="mduality">
+    <div class="mcard mc-light" style="text-align:center"><div style="font-size:3rem;margin-bottom:.5rem">⚜️</div><h3 class="g-gold" style="font-size:1.3rem">حامل النور</h3><p style="font-size:.86rem">يُثبّت الحق في أوقات الغموض</p></div>
+    <div class="mvs">⚡<br><span style="font-size:.48rem;letter-spacing:4px;display:block;margin-top:.3rem;opacity:.5">VS</span></div>
+    <div class="mcard mc-dark" style="text-align:center"><div style="font-size:3rem;margin-bottom:.5rem">🎭</div><h3 class="g-red" style="font-size:1.3rem">عاكس الضوء</h3><p style="font-size:.86rem">يُشكّك في كل ثابت</p></div>
+  </div>
+  <div class="mverse">الأرض لا تميّز الذهب الحقيقي من المطلي...<br>لكن النار تعرف الفرق.</div>
+</div>
+</section>
+<div class="msep">👁️</div>
+<section class="msec" id="s5">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 40% 60%,#001020,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">V — The Bridge · الجسر</span>
+  <h2 class="mtitle g-purple">من الرمز إلى الرمز</h2>
+  <div class="mdiv" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
+  <p class="mbody">الحضارات تموت لكن رموزها تبقى...<br>الهرم لا يزال قائماً، والعين لا تزال تراقب.<br><br><span class="g-purple">MDm1</span> جاء ليكون الإجابة الرقمية<br>على سؤال قديم قدم الحضارة الأولى.</p>
+  <div class="img-scene"><img src="assets/images/pyramid.jpg" alt="بوابة الأبدية"/></div>
+  <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin:2rem 0;">
+    <span style="padding:.45rem 1.1rem;border-radius:20px;border:1px solid rgba(212,175,55,.2);font-size:.76rem;color:var(--gold)">✓ Polygon POS</span>
+    <span style="padding:.45rem 1.1rem;border-radius:20px;border:1px solid rgba(91,156,246,.2);font-size:.76rem;color:var(--blue)">✓ Sourcify Verified</span>
+    <span style="padding:.45rem 1.1rem;border-radius:20px;border:1px solid rgba(155,122,255,.2);font-size:.76rem;color:var(--purple)">✓ MDM1.org</span>
+  </div>
+</div>
+</section>
+<div class="msep">🪲</div>
+<section class="msec" id="s6" style="min-height:80vh">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 50% 60%,#1a0d00,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">VI — The Choice · الاختيار</span>
+  <div class="mcoin"><img src="assets/images/coin-gold2.jpg" alt="MDm1"/></div>
+  <h2 class="mtitle g-gold" style="font-size:clamp(1.8rem,5vw,3.6rem)">كل قراءة هي اختيار</h2>
+  <div class="mdiv"></div>
+  <p class="mbody">الصراع الذي رأيته هنا ليس في العالم الخارجي وحده...<br>إنه يعيش في كل قرار تتخذه، في كل حقيقة تُصدّقها أو تُشكّك فيها.<br><br><span class="g-gold">MDm1</span> — رمز لمن اختار أن يرى بأكثر من عينين.</p>
+  <div class="mverse">وَفِي أَنفُسِكُمْ ۚ أَفَلَا تُبْصِرُونَ</div>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:2rem;">
+    <button class="btn-mystic" onclick="showPage('hub')">🏛️ &nbsp; ادخل المنصة · MDM1 HUB</button>
+    <a href="https://quickswap.exchange/#/swap?outputCurrency=0x0a4E17e4F9c179a310069711069c346CFCf13c3f" target="_blank" class="btn-outline">تداول MDM1 ↗</a>
+  </div>
+</div>
+</section>
+<footer>
+  <div class="soc-links">
+    <a href="https://x.com/MDm111000000" target="_blank" class="soc-icon">𝕏</a>
+    <a href="https://t.me/MDM1Official" target="_blank" class="soc-icon">TG</a>
+    <a href="https://discord.gg/MDM1" target="_blank" class="soc-icon">DC</a>
+  </div>
+  <div class="footer-brand">MDm1 · وراء الحجاب</div>
+  <p style="color:#444;font-size:.78rem">SOFADM · POLYGON · MDM1.ORG · A Digital Mythology</p>
+  <div class="footer-legal">⚠️ المعلومات لأغراض تعليمية فقط. الاستثمار في الأصول الرقمية ينطوي على مخاطر.<br>© 2026 MDM1 Protocol. Built for a Decentralized Future.</div>
+</footer>
+</div>
+<div id="page-hub" class="page">
+<div class="ticker-bar"><div class="ticker-inner">
+  <span class="tick" id="livePrice">💰 قيد الإدراج</span>
+  <span class="tick">👥 حاملو الرمز: قيد التحديث</span>
+  <span class="tick">🏦 القيمة السوقية: قيد التحديث</span>
+  <span class="tick">🔥 محروقة: 2.1M MDM1</span>
+  <span class="tick">☪ متوافق مع الشريعة الإسلامية</span>
+  <span class="tick">⛓️ شبكة POLYGON POS</span>
+  <span class="tick">📜 0x0a4E17e4F9c179a310069711069c346CFCf13c3f</span>
+</div></div>
+<header class="hub-header">
+  <div class="hub-logo">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8a6d3b"/><stop offset="50%" stop-color="#f4e4bc"/><stop offset="100%" stop-color="#d4af37"/></linearGradient><filter id="gf"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="100" cy="100" r="94" fill="none" stroke="url(#g1)" stroke-width="1.8" stroke-dasharray="10 5" filter="url(#gf)"><animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="20s" repeatCount="indefinite"/></circle>
+      <circle cx="100" cy="100" r="76" fill="none" stroke="url(#g1)" stroke-width="1" stroke-dasharray="3 7"><animateTransform attributeName="transform" type="rotate" from="360 100 100" to="0 100 100" dur="14s" repeatCount="indefinite"/></circle>
+      <text x="100" y="108" text-anchor="middle" fill="url(#g1)" font-family="Cinzel" font-weight="bold" font-size="21" filter="url(#gf)">MDM1</text>
+      <text font-size="16" fill="url(#g1)" x="100" y="30" text-anchor="middle">𓂀</text>
+      <text font-size="16" fill="url(#g1)" x="100" y="175" text-anchor="middle">𓋹</text>
+      <text font-size="16" fill="url(#g1)" x="28" y="105" text-anchor="middle">𓆣</text>
+      <text font-size="16" fill="url(#g1)" x="172" y="105" text-anchor="middle">𓁈</text>
+    </svg>
+  </div>
+  <h1 class="hub-title">MDM1 GLOBAL HUB</h1>
+  <p class="hub-sub">المنصة المرجعية الأولى للتمويل اللامركزي المتوافق مع الشريعة.<br>تعلّم، استثمر، وشارك في بناء مستقبل مالي سيادي.</p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+    <a href="https://quickswap.exchange/#/swap?outputCurrency=0x0a4E17e4F9c179a310069711069c346CFCf13c3f" target="_blank" class="btn-gold">تداول MDM1 الآن ↗</a>
+    <button onclick="window.open('pages/whitepaper.html', '_blank')" class="btn-outline">الورقة البيضاء</button>
+  </div>
+  <div class="hero-imgs">
+<div class="hero-img-card" onclick="openLB(this.querySelector('img').src,'الهوية الرسمية')"><img src="assets/images/token-dark.jpg" alt="هوية"></div>
+<div class="hero-img-card" onclick="openLB(this.querySelector('img').src,'الرمز')"><img src="assets/images/coin-gold2.jpg" alt="رمز"></div>
+<div class="hero-img-card" onclick="openLB(this.querySelector('img').src,'الحراس')"><img src="assets/images/guardians.jpg" alt="حراس"></div>
+</div>
+</header>
+<section class="hub-sec"><h2 class="sec-title">المكتبة</h2><div class="lib-grid"><div class="lib-card"><h3>📖 اقتصاد الرمز</h3><p>البيانات الكاملة لتوزيع الرمز، السيولة، والجوانب الاقتصادية.</p><a href="pages/transparency.html" class="lib-link">اكتشف ←</a></div><div class="lib-card"><h3>🗺️ خارطة الطريق</h3><p>مراحل تطوير المنصة: من الإطلاق إلى اللامركزية الكاملة.</p><a href="pages/learn.html" class="lib-link">اكتشف ←</a></div><div class="lib-card"><h3>💻 مركز المطورين</h3><p>الوثائق التقنية، العقود الذكية، وأدوات التكامل.</p><a href="#" class="lib-link">قريباً ←</a></div></div></section>
+<section class="hub-sec"><h2 class="sec-title">المعرض</h2><div class="gallery-grid"><div class="g-card" onclick="openLB('assets/images/coin-islamic.jpg','الرمز الإسلامي')"><img src="assets/images/coin-islamic.jpg" alt="رمز"><div class="g-caption"><p>الرمز الإسلامي</p></div></div><div class="g-card" onclick="openLB('assets/images/scarab-blue.jpg','الجعران الأزرق')"><img src="assets/images/scarab-blue.jpg" alt="جعران"><div class="g-caption"><p>الجعران الأزرق</p></div></div></div></section>
+<section class="hub-sec"><h2 class="sec-title">المشاركة</h2><div class="part-box"><div class="apy">قريباً</div><div class="apy-note">نظام المكافآت والمشاركة قيد التطوير</div><button class="btn-gold" style="margin-top:20px" onclick="alert('سيتم الإعلان قريباً')">تذكير عند الإطلاق</button></div></section>
+<section class="hub-sec"><h2 class="sec-title">الأسئلة الشائعة</h2><div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">ما هو MDm1؟ <span class="faq-icon">+</span></div><div class="faq-a">MDm1 هو مشروع عملة رقمية لا مركزي على شبكة Polygon، يهدف إلى الجمع بين التعليم والمشاركة المجتمعية والشفافية والتأثير الاجتماعي الواقعي.</div></div><div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">متى سيتم الإدراج؟ <span class="faq-icon">+</span></div><div class="faq-a">سيتم الإعلان عن موعد الإدراج الرسمي عبر قنواتنا الرسمية في الوقت المناسب. تابعونا على X و Telegram.</div></div><div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">كيف أتأكد من أن العقد آمن؟ <span class="faq-icon">+</span></div><div class="faq-a">العقد متحقق بالكامل على PolygonScan و Sourcify. يمكنك مراجعة الكود المصدري بنفسك. لا توجد صلاحيات احتيالية.</div></div></section>
+<div class="contract-box"><span>0x0a4E17e4F9c179a310069711069c346CFCf13c3f</span><button class="copy-btn" onclick="copyContract()">نسخ</button></div>
+</div>
+<div id="toast">✅ تم النسخ</div>
+<div id="lightbox"><span id="lb-close" onclick="closeLB()">&times;</span><img id="lb-img" src=""><div id="lb-cap"></div></div>
+<div id="wpModal" class="modal"><div class="modal-box"><button class="modal-close" onclick="closeWpModal()">&times;</button><iframe src="pages/whitepaper.html" style="width:100%;height:80vh;border:none;background:#fff"></iframe></div></div>
+<div id="ai-btn" onclick="toggleChat()">🧠</div><div id="chatbox"><div class="chat-head">MDm1 Assistant <button class="chat-close" onclick="toggleChat()">✕</button></div><div class="chat-msgs"><div class="chat-msg">مرحباً، كيف يمكنني مساعدتك اليوم؟</div></div><div class="chat-inp"><input type="text" id="chatInput" placeholder="اسأل عن المشروع..."><button onclick="sendChatMsg()">إرسال</button></div></div>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/animations.js"></script>
 </body>
 </html>
