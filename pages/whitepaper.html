@@ -1,1 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MDm1 Whitepaper — Official Document</title>
+<meta name="description" content="MDm1 Official Whitepaper — Ecosystem vision, tokenomics, and roadmap."/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+/* ── Whitepaper-specific styles ── */
+.wp-container { width:92%; max-width:950px; margin:auto; padding:40px 0 80px; }
+.wp-hero { text-align:center; margin-bottom:60px; padding-top:30px; }
+.wp-logo { font-family:'Cinzel',serif; font-size:clamp(2.2rem,6vw,3.8rem); color:var(--gold2); letter-spacing:3px; }
+.wp-subtitle { margin-top:10px; color:#777; letter-spacing:2px; font-size:.88rem; }
+.wp-line { width:80px; height:2px; background:var(--gold); margin:22px auto 0; }
+.wp-card {
+  background:linear-gradient(180deg,#0d1016,#080a0f);
+  border:1px solid var(--border); border-radius:20px;
+  padding:32px; margin-bottom:24px;
+}
+.wp-card h2 { color:var(--gold); margin-bottom:16px; font-size:1.2rem; font-family:'Cinzel',serif; }
+.wp-card p  { color:#d0c8b0; font-size:.94rem; line-height:1.9; }
+.wp-card ul { margin-top:14px; padding-right:20px; }
+.wp-card li { margin-bottom:11px; color:#d0c8b0; font-size:.93rem; line-height:1.8; }
+.wp-table { width:100%; border-collapse:collapse; margin-top:18px; }
+.wp-table th { background:var(--gold); color:#000; padding:13px; text-align:left; font-size:.9rem; }
+.wp-table td { border-bottom:1px solid rgba(255,255,255,.06); padding:13px; color:#ccc; font-size:.9rem; }
+.wp-table tr:hover td { background:rgba(212,175,55,.04); }
+.wp-phase { border-left:2px solid var(--gold); padding-left:18px; margin-bottom:22px; }
+.wp-phase-title { color:var(--gold2); font-weight:bold; margin-bottom:7px; font-size:.95rem; }
+.wp-notice {
+  margin-top:22px; padding:16px; border:1px solid rgba(212,175,55,.15);
+  border-radius:12px; background:rgba(212,175,55,.04); color:#c8c0a8; font-size:.88rem;
+}
+.wp-links a {
+  color:var(--gold2); text-decoration:none; display:flex;
+  align-items:center; gap:10px; margin-bottom:12px;
+  padding:12px 16px; border:1px solid var(--border);
+  border-radius:10px; transition:.25s; font-size:.9rem;
+}
+.wp-links a:hover { border-color:var(--gold); background:rgba(212,175,55,.05); }
+.wp-back {
+  display:inline-flex; align-items:center; gap:8px;
+  color:var(--gold); text-decoration:none; font-size:.86rem;
+  padding:8px 18px; border:1px solid var(--border);
+  border-radius:40px; transition:.25s; margin-bottom:32px;
+}
+.wp-back:hover { border-color:var(--gold); background:rgba(212,175,55,.06); }
+@media(max-width:768px){
+  .wp-card { padding:22px; }
+  .wp-table th,.wp-table td { padding:10px; font-size:.84rem; }
+}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
 
+<!-- Minimal nav -->
+<nav style="position:sticky;top:0;z-index:200;background:rgba(3,2,10,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:64px;display:flex;justify-content:space-between;align-items:center;padding:0 5%">
+  <a href="../index.html" class="logo-wrap">
+    <img src="../assets/images/eye-coin.jpg" alt="MDM1" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid var(--gold-dim)"/>
+    <span style="font-family:'Cinzel',serif;color:var(--gold);font-size:1.3rem;font-weight:900;letter-spacing:3px">MDM1</span>
+  </a>
+  <div style="display:flex;gap:16px;align-items:center">
+    <a href="../hub.html" style="color:#ccc;text-decoration:none;font-size:.86rem;font-weight:700">المنصة</a>
+    <a href="../index.html" style="color:#ccc;text-decoration:none;font-size:.86rem;font-weight:700">الرئيسية</a>
+    <button onclick="connectWallet()" class="btn-gold" style="padding:8px 16px;font-size:.8rem">📱 ربط المحفظة</button>
+  </div>
+</nav>
+
+<div class="wp-container">
+
+  <a href="../hub.html" class="wp-back">← العودة للمنصة</a>
+
+  <!-- Hero -->
+  <div class="wp-hero">
+    <div class="wp-logo">MDm1</div>
+    <div class="wp-subtitle">OFFICIAL WHITEPAPER & ECOSYSTEM VISION</div>
+    <div class="wp-line"></div>
+  </div>
+
+  <!-- 1. Overview -->
+  <div class="wp-card">
+    <h2>1. Project Overview</h2>
+    <p>MDm1 is a decentralized digital ecosystem built on the Polygon network. The project aims to combine education, community participation, transparency, and real-world social impact through a long-term evolving platform.</p>
+    <p style="margin-top:14px">The current phase focuses on building a transparent foundation, educational resources, and a sustainable community-driven environment without unrealistic promises or centralized dependence.</p>
+  </div>
+
+  <!-- 2. Vision -->
+  <div class="wp-card">
+    <h2>2. Vision</h2>
+    <p>The long-term vision of MDm1 is to create an open ecosystem where users can learn, participate, contribute, and benefit from educational, community, and future real-world initiatives connected to the project.</p>
+    <div class="wp-notice">
+      ℹ️ Some ecosystem features described in this document represent future goals and community-oriented directions currently under development.
+    </div>
+  </div>
+
+  <!-- 3. Token Utility -->
+  <div class="wp-card">
+    <h2>3. Token Utility</h2>
+    <ul>
+      <li>Community participation and ecosystem interaction.</li>
+      <li>Future educational and platform integrations.</li>
+      <li>Access to future community features and governance participation.</li>
+      <li>Support for future reward systems and platform expansion.</li>
+      <li>Long-term integration with educational and interactive experiences.</li>
+    </ul>
+  </div>
+
+  <!-- 4. Tokenomics -->
+  <div class="wp-card">
+    <h2>4. Tokenomics</h2>
+    <p>Total Supply: <strong style="color:var(--gold)">111,000,000 MDm1</strong></p>
+    <table class="wp-table">
+      <thead>
+        <tr><th>Allocation</th><th>Percentage</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Public Sale</td>     <td style="color:var(--gold);font-weight:700">40%</td><td>Community access and distribution.</td></tr>
+        <tr><td>Liquidity</td>       <td style="color:var(--gold);font-weight:700">20%</td><td>DEX liquidity and market stability.</td></tr>
+        <tr><td>Development</td>     <td style="color:var(--gold);font-weight:700">15%</td><td>Infrastructure and future improvements.</td></tr>
+        <tr><td>Charity &amp; Social Impact</td><td style="color:var(--gold);font-weight:700">10%</td><td>Future community and social initiatives.</td></tr>
+        <tr><td>Rewards &amp; Airdrops</td>     <td style="color:var(--gold);font-weight:700">10%</td><td>Community engagement and ecosystem growth.</td></tr>
+        <tr><td>Reserve</td>         <td style="color:var(--gold);font-weight:700">5%</td> <td>Future ecosystem flexibility.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. Transparency -->
+  <div class="wp-card">
+    <h2>5. Transparency</h2>
+    <ul>
+      <li>Verified smart contract on PolygonScan and Sourcify.</li>
+      <li>Public official website and social channels.</li>
+      <li>Community-oriented long-term development approach.</li>
+      <li>Future transparency updates and ecosystem reporting.</li>
+    </ul>
+    <div style="margin-top:18px;background:rgba(0,0,0,.6);border:1px dashed var(--gold);border-radius:10px;padding:14px;direction:ltr;font-family:monospace;font-size:.8rem;color:var(--gold);word-break:break-all">
+      Contract: 0x0a4E17e4F9c179a310069711069c346CFCf13c3f — Polygon POS
+    </div>
+  </div>
+
+  <!-- 6. Roadmap -->
+  <div class="wp-card">
+    <h2>6. Roadmap</h2>
+    <div class="wp-phase">
+      <div class="wp-phase-title">✅ Phase 1 — Foundation</div>
+      <p style="color:#888;font-size:.88rem">Official launch, contract verification, liquidity setup, and ecosystem foundation.</p>
+    </div>
+    <div class="wp-phase">
+      <div class="wp-phase-title">🔄 Phase 2 — Community &amp; Education</div>
+      <p style="color:#888;font-size:.88rem">Educational library, transparency pages, community growth, and platform improvements.</p>
+    </div>
+    <div class="wp-phase">
+      <div class="wp-phase-title">🔮 Phase 3 — Interactive Ecosystem</div>
+      <p style="color:#888;font-size:.88rem">Expansion of ecosystem tools, future participation systems, and interactive features.</p>
+    </div>
+    <div class="wp-phase">
+      <div class="wp-phase-title">🌐 Phase 4 — Long-Term Expansion</div>
+      <p style="color:#888;font-size:.88rem">Community-driven development, future integrations, and broader ecosystem initiatives.</p>
+    </div>
+  </div>
+
+  <!-- 7. Official Links -->
+  <div class="wp-card">
+    <h2>7. Official Links</h2>
+    <div class="wp-links">
+      <a href="https://mdm1.org" target="_blank">🌐 Official Website — mdm1.org</a>
+      <a href="https://x.com/MDm111000000" target="_blank">𝕏 Official X Account — @MDm111000000</a>
+      <a href="https://polygonscan.com/token/0x0a4E17e4F9c179a310069711069c346CFCf13c3f" target="_blank">🔍 Smart Contract — PolygonScan</a>
+    </div>
+  </div>
+
+  <!-- 8. Disclaimer -->
+  <div class="wp-card">
+    <h2>8. Disclaimer</h2>
+    <p>MDm1 is an evolving decentralized ecosystem project. This document is provided for informational purposes only and does not represent financial advice, investment guarantees, or promises of future profits.</p>
+    <p style="margin-top:14px">Cryptocurrency markets involve risks, and participants should conduct their own research before interacting with digital assets.</p>
+  </div>
+
+  <div style="text-align:center;margin-top:40px;color:#444;font-size:.82rem">
+    © 2026 MDm1 — All Rights Reserved
+  </div>
+
+</div>
+
+<div id="toast"></div>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/ui.js"></script>
+</body>
+</html>
