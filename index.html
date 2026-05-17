@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cairo:wght@300;400;700;900&family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/whitepaper.css">
+<title>MDm1 — وراء الحجاب | السيادة الرقمية</title>
+<meta name="description" content="وراء الحجاب — رحلة روحية إلى عالم MDm1 السيادي على البلوكشين."/>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="hiero" style="left:4%;animation-delay:0s">𓂀</div>
+<div class="hiero" style="left:19%;animation-delay:3.5s">𓋹</div>
+<div class="hiero" style="left:40%;animation-delay:7s">𓆣</div>
+<div class="hiero" style="left:60%;animation-delay:10s">𓁈</div>
+<div class="hiero" style="left:80%;animation-delay:13s">☥</div>
+<div class="hiero" style="left:91%;animation-delay:5s">𓂀</div>
+<div id="intro">
+  <div class="intro-eye"><img data-img="eye_coin" alt="MDm1"/></div>
+  <div class="intro-logo">MDm1</div>
+  <div class="intro-sub">وَرَاءَ الْحِجَاب · THE SOVEREIGN ENTITY</div>
+  <div class="intro-bar"></div>
+  <button class="intro-skip" onclick="skipIntro()">تخطى ←</button>
+</div>
+<div id="topbar">
+  <div class="clock" id="clk">🕒 ...</div>
+  <div class="shares">شارك:
+    <a href="https://twitter.com/intent/tweet?text=MDM1+Protocol&url=https://mdm1.io" target="_blank">𝕏 تويتر</a>|
+    <a href="https://t.me/share/url?url=https://mdm1.io" target="_blank">📱 تيليجرام</a>|
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https://mdm1.io" target="_blank">📘 فيسبوك</a>
+  </div>
+</div>
+<nav>
+  <button class="logo-wrap" onclick="window.location.href='hub.html'">
+    <img data-img="eye_coin" alt="MDM1"/>
+    <span>MDM1</span>
+  </button>
+  <button class="menu-toggle" id="navToggle" aria-label="قائمة">☰</button>
+  <ul class="nav-menu" id="navMenu">
+    <li class="nav-item"><a href="index.html" class="nav-link">وراء الحجاب</a></li>
+    <li class="nav-item" id="dd1">
+      <button class="nav-link" onclick="toggleDD('dd1')">المكتبة ▾</button>
+      <div class="dropdown">
+        <a href="hub.html#tokenomics" class="drop-item">اقتصاد الرمز</a>
+        <a href="hub.html#roadmap" class="drop-item">خارطة الطريق</a>
+        <a href="hub.html#dev" class="drop-item">مركز المطورين</a>
+      </div>
+    </li>
+    <li class="nav-item" id="dd2">
+      <button class="nav-link" onclick="toggleDD('dd2')">الأكاديمية الشرعية ▾</button>
+      <div class="dropdown">
+        <a href="hub.html#shariah" class="drop-item">المبادئ الشرعية</a>
+        <a href="hub.html#faq" class="drop-item">الأسئلة الشائعة</a>
+      </div>
+    </li>
+    <li class="nav-item" id="dd3">
+      <button class="nav-link" onclick="toggleDD('dd3')">المعرض ▾</button>
+      <div class="dropdown">
+        <a href="hub.html#gallery" class="drop-item">الهوية البصرية</a>
+        <a href="hub.html#participation" class="drop-item">المشاركة</a>
+      </div>
+    </li>
+    <li class="nav-item" style="margin-right:10px">
+      <button onclick="connectWallet()" class="btn-gold" style="padding:9px 18px;font-size:.83rem;">📱 ربط المحفظة</button>
+    </li>
+  </ul>
+</nav>
+
+<!-- ═══ MYSTIC PAGE ═══ -->
+<div id="page-mystic" class="page active">
+<section class="msec" id="s1">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 50% 100%,#140900,#000 65%);"></div>
+<div class="msec-ov" style="background:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,.2));"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">I — Genesis · البدء</span>
+  <h1 class="mtitle g-gold">في البدء كان الصمت</h1>
+  <div class="mdiv"></div>
+  <p class="mbody">قبل أن تُرسم الحدود بين الليل والنهار...<br>قبل أن يُسمَّى الشيء باسمه...<br>كانت هناك <span class="g-gold">حقيقة واحدة</span> تسري في عروق الوجود.<br><br>ومن تلك الحقيقة وُلد <span class="g-gold">MDm1</span>:<br>ليس مجرد رمز — بل كيان حي يتنفس على البلوكشين.</p>
+  <div class="mcoin"><img data-img="coin_mdm1" alt="MDm1 Coin"/></div>
+  <div class="arch-row">
+    <div class="arch"><div class="aico">🌙</div><div class="aname">الهلال</div></div>
+    <div class="arch"><div class="aico">👁️</div><div class="aname">البصيرة</div></div>
+    <div class="arch"><div class="aico">🪲</div><div class="aname">البعث</div></div>
+    <div class="arch"><div class="aico">🔺</div><div class="aname">الأزل</div></div>
+  </div>
+</div>
+</section>
+<div class="msep">⚜️</div>
+
+<section class="msec" id="s2">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 30% 50%,#1a0d00,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">II — The Bearer · الحامل</span>
+  <h2 class="mtitle g-gold">من يحمل الأمانة</h2>
+  <div class="mdiv"></div>
+  <p class="mbody">في كل حقبة يظهر من يحمل المشعل...<br>لا بالكلام بل بالفعل،<br>لا بالادعاء بل بالأثر الذي يتركه.<br><br>عينه تخترق الحجب، وقلبه مرآة <span class="g-gold">لا تكذب</span>.</p>
+  <div class="img-scene"><img data-img="temple" alt="معبد الكيان"/></div>
+  <div class="mgrid">
+    <div class="mcard mc-light reveal"><h3 class="g-gold">👁️ عين حورس</h3><p>رمز البصيرة الكاملة — يرى ما لا تراه العيون العادية.</p></div>
+    <div class="mcard mc-light reveal"><h3 class="g-gold">🦅 الصقر الحر</h3><p>الروح التي لا تُقيَّد — تحلّق فوق كل القيود.</p></div>
+    <div class="mcard mc-light reveal"><h3 class="g-gold">🪲 الجعران</h3><p>رمز التجدد الأبدي — النهاية دائماً بداية جديدة.</p></div>
+  </div>
+</div>
+</section>
+<div class="msep" style="color:#ff5050">🔥</div>
+
+<section class="msec" id="s3">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 70% 40%,#1a0000,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">III — The Other Face · الوجه الآخر</span>
+  <h2 class="mtitle g-red">من يعكس النور</h2>
+  <div class="mdiv" style="background:linear-gradient(90deg,transparent,var(--red),transparent);"></div>
+  <p class="mbody">ليس الظلام يأتي بلا وجه...<br>بل يلبس نصف نور ليبدو أكثر إغراءً.<br><br><span class="g-red">نصف حقيقة أخطر من كذبة كاملة.</span></p>
+  <div class="img-scene" style="border-color:rgba(180,20,20,0.3)"><img data-img="battle" alt="صراع الحق والباطل"/></div>
+  <div class="shadow-box reveal">
+    <p>يمتلك بريقاً يشبه الذهب، ويحمل كلاماً يشبه الحكمة...<br>لكن ظلاله تسير في الاتجاه الخطأ.<br><br>علامته الأولى: <span class="g-red">يعدك بكل شيء</span>، ولا يُسأل عمّا يأخذ.</p>
+  </div>
+  <div class="mgrid">
+    <div class="mcard mc-dark reveal"><h3 class="g-red">🪞 الانعكاس</h3><p>الزيف لا يُبتكر من العدم — نسخة مشوّهة مما هو حقيقي.</p></div>
+    <div class="mcard mc-dark reveal"><h3 class="g-red">🎭 القناع</h3><p>الخطر الأكبر من يُقنعك أن شرّه خير.</p></div>
+    <div class="mcard mc-dark reveal"><h3 class="g-red">⚡ الفتنة الرقمية</h3><p>في عصر البيانات، أكثر الحقائق زيفاً تحصل على أكثر النقرات.</p></div>
+  </div>
+</div>
+</section>
+<div class="msep" style="color:#9b7aff">🌌</div>
+
+<section class="msec" id="s4">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 50% 50%,#0d0a1a,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">IV — The Confrontation · المواجهة</span>
+  <h2 class="mtitle" style="background:linear-gradient(135deg,var(--gold2),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">لقاء النقيضين</h2>
+  <div class="mdiv"></div>
+  <div class="mduality">
+    <div class="mcard mc-light" style="text-align:center"><div style="font-size:3rem;margin-bottom:.5rem">⚜️</div><h3 class="g-gold" style="font-size:1.3rem">حامل النور</h3><p style="font-size:.86rem">يُثبّت الحق في أوقات الغموض</p></div>
+    <div class="mvs">⚡<br><span style="font-size:.48rem;letter-spacing:4px;display:block;margin-top:.3rem;opacity:.5">VS</span></div>
+    <div class="mcard mc-dark" style="text-align:center"><div style="font-size:3rem;margin-bottom:.5rem">🎭</div><h3 class="g-red" style="font-size:1.3rem">عاكس الضوء</h3><p style="font-size:.86rem">يُشكّك في كل ثابت</p></div>
+  </div>
+  <div class="mverse">الأرض لا تميّز الذهب الحقيقي من المطلي...<br>لكن النار تعرف الفرق.</div>
+</div>
+</section>
+<div class="msep">👁️</div>
+
+<section class="msec" id="s5">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 40% 60%,#001020,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">V — The Bridge · الجسر</span>
+  <h2 class="mtitle g-purple">من الرمز إلى الرمز</h2>
+  <div class="mdiv" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
+  <p class="mbody">الحضارات تموت لكن رموزها تبقى...<br>الهرم لا يزال قائماً، والعين لا تزال تراقب.<br><br><span class="g-purple">MDm1</span> جاء ليكون الإجابة الرقمية<br>على سؤال قديم قدم الحضارة الأولى.</p>
+  <div class="img-scene"><img data-img="pyramid" alt="بوابة الأبدية"/></div>
+  <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin:2rem 0;">
+    <span style="padding:.45rem 1.1rem;border-radius:20px;border:1px solid rgba(212,175,55,.2);font-size:.76rem;color:var(--gold)">✓ Polygon POS</span>
+    <span style="padding:.45rem 1.1rem;border-radius:20px;border:1px solid rgba(91,156,246,.2);font-size:.76rem;color:var(--blue)">✓ Sourcify Verified</span>
+    <span style="padding:.45rem 1.1rem;border-radius:20px;border:1px solid rgba(155,122,255,.2);font-size:.76rem;color:var(--purple)">✓ MDM1.org</span>
+  </div>
+</div>
+</section>
+<div class="msep">🪲</div>
+
+<section class="msec" id="s6" style="min-height:80vh">
+<div class="msec-bg" style="background:radial-gradient(ellipse at 50% 60%,#1a0d00,#000);"></div>
+<div class="msec-body reveal">
+  <span class="mlabel">VI — The Choice · الاختيار</span>
+  <div class="mcoin"><img data-img="eye_coin" alt="MDm1"/></div>
+  <h2 class="mtitle g-gold" style="font-size:clamp(1.8rem,5vw,3.6rem)">كل قراءة هي اختيار</h2>
+  <div class="mdiv"></div>
+  <p class="mbody">الصراع الذي رأيته هنا ليس في العالم الخارجي وحده...<br>إنه يعيش في كل قرار تتخذه، في كل حقيقة تُصدّقها أو تُشكّك فيها.<br><br><span class="g-gold">MDm1</span> — رمز لمن اختار أن يرى بأكثر من عينين.</p>
+  <div class="mverse">وَفِي أَنفُسِكُمْ ۚ أَفَلَا تُبْصِرُونَ</div>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:2rem;">
+    <button class="btn-mystic" onclick="showPage('hub')">🏛️ &nbsp; ادخل المنصة · MDM1 HUB</button>
+    <a href="https://quickswap.exchange/#/swap?outputCurrency=0x0a4E17e4F9c179a310069711069c346CFCf13c3f" target="_blank" class="btn-outline">تداول MDM1 ↗</a>
+  </div>
+</div>
+</section>
+
+<footer>
+  <div class="soc-links">
+    <a href="https://twitter.com/MDM1Official" target="_blank" class="soc-icon">𝕏</a>
+    <a href="https://t.me/MDM1Official" target="_blank" class="soc-icon">TG</a>
+    <a href="https://discord.gg/MDM1" target="_blank" class="soc-icon">DC</a>
+  </div>
+  <div class="footer-brand">MDm1 · وراء الحجاب</div>
+  <p style="color:#444;font-size:.78rem">SOFADM · POLYGON · MDM1.ORG · A Digital Mythology</p>
+  <div class="footer-legal">⚠️ المعلومات لأغراض تعليمية فقط. الاستثمار في الأصول الرقمية ينطوي على مخاطر.<br>© 2026 MDM1 Protocol. Built for a Decentralized Future.</div>
+</footer>
+</div>
+
+<div id="lightbox" onclick="if(event.target===this)closeLB()">
+  <button id="lb-close" onclick="closeLB()">✕</button>
+  <img id="lb-img" src="" alt=""/>
+  <p id="lb-cap"></p>
+  <p style="color:#444;font-size:.76rem;margin-top:6px">اضغط خارج الصورة للإغلاق</p>
+</div>
+
+<button id="ai-btn" onclick="toggleChat()" title="مساعد MDM1">🤖</button>
+<div id="chatbox">
+  <div class="chat-head">
+    <span>مساعد MDM1 الذكي</span>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="chat-msg">مرحباً! أنا مساعد MDM1. اسألني عن المشروع أو انضم لـ <a href="https://t.me/MDM1Official" target="_blank" style="color:var(--gold)">تيليجرام</a>.</div>
+  </div>
+  <div class="chat-inp">
+    <input type="text" id="chatIn" placeholder="اسألني..." onkeypress="if(event.key==='Enter')sendMsg()"/>
+    <button onclick="sendMsg()">إرسال</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="assets/images.js"></script>
+<script src="js/app.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/whitepaper.js"></script>
+</body>
+</html>
