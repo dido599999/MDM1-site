@@ -362,19 +362,14 @@
 </head>
 <body>
 
-<!-- PARTICLES -->
 <div id="particles"></div>
 
-<!-- INTRO SCREEN -->
 <div id="intro">
   <div class="intro-eye anim-float">👁️</div>
   <div class="intro-title">MDm1</div>
   <div class="intro-sub">صراع الأزل</div>
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     CHAPTER 0 — PROLOGUE
-═══════════════════════════════════════════════ -->
 <section class="chapter" id="ch0" style="background:#000; min-height:100vh;">
   <div class="chapter-overlay" style="background:radial-gradient(ellipse at 50% 60%, #1a0900, #000);"></div>
   <div class="chapter-content reveal">
@@ -407,9 +402,6 @@
 
 <div class="eye-sep">👁️</div>
 
-<!-- ═══════════════════════════════════════════════
-     CHAPTER 1 — THE LIGHT SIDE
-═══════════════════════════════════════════════ -->
 <section class="chapter" id="ch1">
   <div class="chapter-bg" style="background: radial-gradient(ellipse at top, #2a1500, #000);"></div>
   <div class="chapter-overlay"></div>
@@ -446,9 +438,6 @@
 
 <div class="eye-sep" style="color:#cc2222;">🔥</div>
 
-<!-- ═══════════════════════════════════════════════
-     CHAPTER 2 — THE DARK SIDE
-═══════════════════════════════════════════════ -->
 <section class="chapter" id="ch2">
   <div class="chapter-bg" style="background: radial-gradient(ellipse at center, #200000, #000);"></div>
   <div class="chapter-overlay"></div>
@@ -485,9 +474,6 @@
 
 <div class="eye-sep" style="color:#60a5fa;">🌙</div>
 
-<!-- ═══════════════════════════════════════════════
-     CHAPTER 3 — THE COSMIC DUALITY
-═══════════════════════════════════════════════ -->
 <section class="chapter" id="ch3">
   <div class="chapter-bg" style="background: radial-gradient(ellipse at 30% 50%, #001030, #000);"></div>
   <div class="chapter-overlay"></div>
@@ -522,9 +508,6 @@
 
 <div class="eye-sep">🪲</div>
 
-<!-- ═══════════════════════════════════════════════
-     CHAPTER 4 — THE BATTLE
-═══════════════════════════════════════════════ -->
 <section class="chapter" id="ch4">
   <div class="chapter-bg" style="background:radial-gradient(ellipse at center, #150800, #000);"></div>
   <div class="chapter-overlay"></div>
@@ -537,11 +520,9 @@
     <p class="ch-body">
       هذا ليس صراعاً بين دولتين أو جيشين...<br>
       إنه الصراع <span class="glow-gold">الأقدم في التاريخ</span>:<br>
-      بين الروح والنفس، بين الحق والباطل،<br>
+      بين الروح والنفس, بين الحق والباطل،<br>
       بين من يعرف الحقيقة <span class="glow-red">ومن يدّعيها.</span>
     </p>
-
-
 
     <div class="verse" style="border-color:rgba(245,158,11,.3);">
       اللَّهُ أَحَدٌ — لَمْ يَلِدْ وَلَمْ يُولَدْ
@@ -559,9 +540,6 @@
 
 <div class="eye-sep" style="color:#a78bfa;">✨</div>
 
-<!-- ═══════════════════════════════════════════════
-     CHAPTER 5 — MDm1 AS THE BRIDGE
-═══════════════════════════════════════════════ -->
 <section class="chapter" id="ch5">
   <div class="chapter-bg" style="background:radial-gradient(ellipse at 50% 0%, #1a0a30, #000);"></div>
   <div class="chapter-overlay"></div>
@@ -609,9 +587,6 @@
 
 <div class="eye-sep">👁️</div>
 
-<!-- ═══════════════════════════════════════════════
-     CHAPTER 6 — EPILOGUE
-═══════════════════════════════════════════════ -->
 <section class="chapter" id="ch6">
   <div class="chapter-bg" style="background:radial-gradient(ellipse at 50% 50%, #1a0d00, #000);"></div>
   <div class="chapter-overlay"></div>
@@ -635,8 +610,6 @@
     <div class="verse">
       إِنَّ اللَّهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتَّىٰ يُغَيِّرُوا مَا بِأَنفُسِهِمْ
     </div>
-
-
 
     <div class="symbols" style="margin-top:2.5rem; opacity:.5;">
       <div class="sym"><span class="icon" style="font-size:1.5rem;">👁️</span><span class="name">حورس</span></div>
@@ -682,6 +655,34 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 setTimeout(() => {
   window.scrollTo({ top: 1, behavior: 'smooth' });
 }, 5200);
+
+// ── 🌟 كود التمرير الذكي الجديد للانتقال إلى HUB.HTML 🌟 ──
+const lastSection = document.getElementById('ch6');
+
+// 1. للهواتف (عبر اللمس)
+let touchStartPos = 0;
+window.addEventListener('touchstart', (e) => {
+  touchStartPos = e.touches[0].clientY;
+}, { passive: true });
+
+window.addEventListener('touchmove', (e) => {
+  const touchEndPos = e.touches[0].clientY;
+  const rect = lastSection.getBoundingClientRect();
+  
+  // إذا كانت الخاتمة ظاهرة على الشاشة وقام المستخدم بالسحب لأعلى ليفتح ما بعدها
+  if (rect.bottom <= window.innerHeight + 50 && touchStartPos > touchEndPos + 35) {
+    window.location.href = "hub.html";
+  }
+}, { passive: true });
+
+// 2. للكمبيوتر (عبر عجلة الماوس)
+window.addEventListener('wheel', (e) => {
+  const rect = lastSection.getBoundingClientRect();
+  // إذا وصلنا لنهاية الخاتمة وحرك الماوس لأسفل
+  if (rect.bottom <= window.innerHeight + 50 && e.deltaY > 0) {
+    window.location.href = "hub.html";
+  }
+}, { passive: true });
 </script>
 </body>
 </html>
