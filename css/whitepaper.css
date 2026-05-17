@@ -1,0 +1,21 @@
+.wp-h {
+  color: var(--gold); border-right: 4px solid var(--gold);
+  padding-right: 14px; margin: 22px 0 12px;
+  font-family: 'Cinzel', serif; font-size: 1rem;
+}
+.wp-section { margin-bottom: 28px; }
+.wp-text { line-height: 1.9; color: #ccc; font-size: .92rem; }
+.wp-table { width:100%; border-collapse:collapse; margin:18px 0; font-size:.88rem; }
+.wp-table th { background:var(--gold); color:#000; padding:11px 14px; text-align:right; }
+.wp-table td { padding:11px 14px; border-bottom:1px solid rgba(212,175,55,0.12); color:#bbb; }
+.wp-table tr:hover td { background:rgba(212,175,55,0.04); }
+.wp-close-btn, .wp-pdf-btn {
+  padding:11px 28px; border-radius:50px; cursor:pointer;
+  font-weight:bold; transition:.3s; font-family:'Cairo',sans-serif; margin:5px;
+}
+.wp-close-btn { background:transparent; border:1px solid var(--gold); color:var(--gold); }
+.wp-pdf-btn   { background:var(--gold); border:none; color:#000; }
+.wp-close-btn:hover, .wp-pdf-btn:hover { transform:translateY(-2px); }
+.wp-badge { display:inline-block; padding:3px 12px; border-radius:20px; font-size:.74rem; font-weight:700; margin:2px; }
+.wp-badge-green { background:rgba(46,125,50,0.2); color:#a5d6a7; border:1px solid #2e7d32; }
+.wp-badge-gold  { background:rgba(212,175,55,0.15); color:var(--gold); border:1px solid rgba(212,175,55,0.3); }
