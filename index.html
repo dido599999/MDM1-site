@@ -683,5 +683,20 @@ setTimeout(() => {
   window.scrollTo({ top: 1, behavior: 'smooth' });
 }, 5200);
 </script>
+  <script>
+  // نراقب حركة التمرير (Scroll) في الصفحة
+  window.addEventListener('scroll', () => {
+    // حساب المساحة الإجمالية للمستند وموقع التمرير الحالي
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+
+    // إذا وصل المستخدم إلى أسفل الصفحة تماماً (أو بقي 5 بكسل فقط)
+    if (scrollTop + windowHeight >= documentHeight - 5) {
+      // الانتقال بسلاسة إلى الصفحة الثانية
+      window.location.href = "hub.html";
+    }
+  });
+</script>
 </body>
 </html>
