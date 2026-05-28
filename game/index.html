@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>تحدي المعرفة اللانهائي · MDM1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Cairo', sans-serif; }
+    body { background-color: #0d0e12; color: #f3f4f6; }
+    .neon-border { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+    .progress-bar { transition: width 0.1s linear; }
+  </style>
+</head>
+<body class="antialiased selection:bg-blue-600 selection:text-white">
+
+  <div id="app"></div>
+
+  <!-- Frameworks -->
+  <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // بنك أسئلة ضخم ومتنوع بالكامل مع صور مخصصة متغيرة لكل سؤال
+    const QUESTIONS_DATA = [
+      { text: "أي كوكب في نظامنا الشمسي يشتهر بحلقاته الضخمة المحيطة به؟", options: ["المشتري", "زحل", "أورانوس", "المريخ"], correct: 1, img: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?q=80&w=600" },
+      { text: "ما هي عاصمة دولة إيطاليا وتاريخها العريق؟", options: ["باريس", "مدريد", "روما", "لندن"], correct: 2, img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=600" },
+      { text: "ما هو الطائر الذي يعتبر شعاراً للولايات المتحدة الأمريكية ويتميز بقوته؟", options: ["النسر الأصلع", "الصقر الحر", "البومة الحكيمة", "الغراب"], correct: 0, img: "https://images.unsplash.com/photo-1611689342806-0863700ce1e4?q=80&w=600" },
+      { text: "ما هو العنصر الكيميائي الذي يمثله الرمز (O) في الجدول الدوري؟", options: ["الذهب", "الهيدروجين", "الأكسجين", "الحديد"], correct: 2, img: "https://images.unsplash.com/photo-1532187863486-abf9d39d6618?q=80&w=600" },
+      { text: "أي من هذه الأجهزة يعتبر وحدة الإخراج الأساسية لعرض الصور والفيديوهات؟", options: ["لوحة المفاتيح", "الفأرة", "الشاشة", "المعالج"], correct: 2, img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=600" },
+      { text: "ما هو الحيوان البري الذي يعتبر الأسرع على كوكب الأرض في المسافات القصيرة؟", options: ["الأسد", "الفهد الصياد", "الغزال", "الحصان البري"], correct: 1, img: "https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=600" },
+      { text: "ما هي القارة الأكبر من حيث المساحة وسكان العالم؟", options: ["أفريقيا", "أوروبا", "آسيا", "أمريكا الشمالية"], correct: 2, img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600" },
+      { text: "كم عدد ألوان قوس قزح الرئيسية التي تظهر بعد سقوط المطر؟", options: ["5 ألوان", "6 ألوان", "7 ألوان", "8 ألوان"], correct: 2, img: "https://images.unsplash.com/photo-1434064511983-18c6dae20ed5?q=80&w=600" }
+    ];
+
+    const GameApp = () => {
+      const [gameState, setGameState] = useState('menu'); // menu, playing, gameover
+      const [score, setScore] = useState(0);
+      const [lives, setLives] = useState(3);
+      const [currentQIndex, setCurrentQIndex] = useState(0);
+      const [shuffledQuestions, setShuffledQuestions] = useState([]);
+      const [timeLeft, setTimeLeft] = useState(100); // نسبة مئوية للمؤقت
+      const [answered, setAnswered] = useState(false);
+      const [selectedOption, setSelectedOption] = useState(null);
+
+      const timerRef = useRef(null);
+
+      // بدء لعبة جديدة بالكامل وإعادة تدوير الأسئلة بشكل عشوائي لانهائي
+      const startGame = () => {
+        const scrambled = [...QUESTIONS_DATA].sort(() => 0.5 - Math.random());
+        setShuffledQuestions(scrambled);
+        setScore(0);
+        setLives(3);
+        setCurrentQIndex(0);
+        setGameState('playing');
+        resetQuestionState();
+      };
+
+      const resetQuestionState = () => {
+        setAnswered(false);
+        setSelectedOption(null);
+        setTimeLeft(100);
+      };
+
+      // متحكم المؤقت التنازلي التفاعلي
+      useEffect(() => {
+        if (gameState !== 'playing' || answered) return;
+
+        timerRef.current = setInterval(() => {
+          setTimeLeft((prev) => {
+            if (prev <= 0) {
+              clearInterval(timerRef.current);
+              handleAnswer(-1); // الوقت انتهى = خطأ
+              return 0;
+            }
+            return prev - 1.5; // سرعة العداد
+          });
+        }, 150);
+
+        return () => clearInterval(timerRef.current);
+      }, [gameState, currentQIndex, answered]);
+
+      const handleAnswer = (index) => {
+        if (answered) return;
+        setAnswered(true);
+        setSelectedOption(index);
+        clearInterval(timerRef.current);
+
+        const currentQuestion = shuffledQuestions[currentQIndex];
+        const isCorrect = index === currentQuestion.correct;
+
+        if (isCorrect) {
+          setScore(prev => prev + 10);
+        } else {
+          setLives(prev => {
+            const nextLives = prev - 1;
+            if (nextLives <= 0) {
+              setTimeout(() => setGameState('gameover'), 1000);
+            }
+            return nextLives;
+          });
+        }
+
+        // الانتقال التلقائي للسؤال التالي بشكل لانهائي
+        setTimeout(() => {
+          if (lives > 1 || (lives === 1 && isCorrect)) {
+            setCurrentQIndex(prev => {
+              if (prev + 1 >= shuffledQuestions.length) {
+                // إذا انتهت الأسئلة، قم بإعادة خلط الكروت لضمان اللعب اللانهائي دون توقف
+                const reshuffled = [...QUESTIONS_DATA].sort(() => 0.5 - Math.random());
+                setShuffledQuestions(reshuffled);
+                return 0;
+              }
+              return prev + 1;
+            });
+            resetQuestionState();
+          }
+        }, 1200);
+      };
+
+      const activeQ = shuffledQuestions[currentQIndex];
+
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          
+          {/* 1. الشاشة الرئيسية الحقيقية للعبة */}
+          {gameState === 'menu' && (
+            <div className="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-2xl text-center shadow-2xl">
+              <div className="w-20 h-20 bg-blue-600/10 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl text-blue-500">🎮</div>
+              <h1 className="text-2xl font-black text-white mb-2 tracking-wide">تحدي المعرفة اللانهائي</h1>
+              <p className="text-slate-400 text-sm mb-6">منصة اختبارات تفاعلية حية، أجب بشكل صحيح لتستمر في اللعب وتجمع النقاط.</p>
+              <button onClick={startGame} className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-blue-900/30 text-base">
+                ابدأ اللعب الآن
+              </button>
+            </div>
+          )}
+
+          {/* 2. شاشة اللعب الفعلي مع تبديل الصور التفاعلية */}
+          {gameState === 'playing' && activeQ && (
+            <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl transition-all">
+              
+              {/* شريط البيانات العلوي */}
+              <div className="bg-slate-950 p-4 flex justify-between items-center border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-400">النقاط:</span>
+                  <span className="font-mono text-xl font-black text-yellow-500">{score}</span>
+                </div>
+                <div className="flex gap-1 text-lg">
+                  {[...Array(3)].map((_, i) => (
+                    <span key={i} className={i < lives ? "text-red-500" : "text-slate-700"}>❤️</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* شريط المؤقت الزمني الحركي */}
+              <div className="w-full h-1.5 bg-slate-800">
+                <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 progress-bar" style={{ width: `${timeLeft}%` }} />
+              </div>
+
+              {/* الصورة الديناميكية المتغيرة مع كل سؤال */}
+              <div className="w-full h-48 md:h-64 relative bg-slate-950">
+                <img src={activeQ.img} alt="Question Context" className="w-full h-full object-cover transition-all duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
+              </div>
+
+              {/* نص السؤال المتغير */}
+              <div className="p-6">
+                <h2 className="text-lg md:text-xl font-bold text-white mb-6 leading-relaxed text-right">
+                  {activeQ.text}
+                </h2>
+
+                {/* أزرار الخيارات التفاعلية التلقائية */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {activeQ.options.map((opt, idx) => {
+                    let btnStyle = "bg-slate-800/80 border-slate-700 text-slate-200 hover:bg-slate-800 hover:border-slate-500";
+                    if (answered) {
+                      if (idx === activeQ.correct) {
+                        btnStyle = "bg-emerald-950 border-emerald-500 text-emerald-200 font-bold neon-border";
+                      } else if (idx === selectedOption) {
+                        btnStyle = "bg-rose-950 border-rose-500 text-rose-200";
+                      } else {
+                        btnStyle = "opacity-30 bg-slate-900 border-slate-800 text-slate-500";
+                      }
+                    }
+
+                    return (
+                      <button key={idx} disabled={answered} onClick={() => handleAnswer(idx)}
+                              className={`w-full p-4 rounded-xl text-right text-sm border font-medium transition-all duration-150 ${btnStyle}`}>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* 3. شاشة انتهاء اللعب الحقيقية وحساب المجموع */}
+          {gameState === 'gameover' && (
+            <div className="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-2xl text-center shadow-2xl">
+              <div className="w-16 h-16 bg-rose-600/10 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-rose-500">💀</div>
+              <h1 className="text-2xl font-black text-white mb-1">انتهت المحاولة!</h1>
+              <p className="text-slate-400 text-xs mb-6">نفدت القلوب المتاحة لديك لتجاوز الاختبارات.</p>
+              
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 mb-6">
+                <div className="text-xs text-slate-500 mb-1">مجموع نقاطك النهائي</div>
+                <div className="text-3xl font-black text-yellow-500 font-mono">{score}</div>
+              </div>
+
+              <div className="flex gap-3">
+                <button onClick={startGame} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">
+                  حاول مجدداً 🔄
+                </button>
+                <button onClick={() => setGameState('menu')} className="px-5 bg-slate-800 hover:bg-slate-700 text-slate-400 py-2.5 rounded-xl text-sm transition-all">
+                  القائمة
+                </button>
+              </div>
+            </div>
+          )}
+
+        </div>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById("app")).render(<GameApp />);
+  </script>
+</body>
+</html>
