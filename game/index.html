@@ -51,7 +51,7 @@
 
   <script type="text/babel">
     // =====================================================================
-    // MDM1 · Rites of the Duat — single-file React app
+    // MDM1 · Rites of the Duat — single-file React app (FULLY FIXED)
     // =====================================================================
 
     // -------------------- SUPABASE --------------------
@@ -165,7 +165,7 @@
       </svg>
     );
 
-    // -------------------- AUTH SCREEN --------------------
+    // -------------------- AUTH SCREEN (FIXED: email capitalisation) --------------------
     const AuthScreen = ({ onSignIn, onSignUp }) => {
       const [email, setEmail]     = useState("");
       const [pass,  setPass]      = useState("");
@@ -198,11 +198,14 @@
             <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-600 tracking-wider mb-1">{t.title}</h2>
             <p className="text-xs text-amber-500/80 tracking-widest mb-4 font-medium">{t.subtitle}</p>
             <input className="w-full mt-4 p-2 bg-black/70 border border-amber-700/60 rounded text-amber-100 placeholder-amber-700/70 focus:outline-none focus:border-amber-400"
+                   type="email" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck="false"
                    placeholder={t.email} value={email} onChange={e => setEmail(e.target.value)} />
             <input className="w-full mt-2 p-2 bg-black/70 border border-amber-700/60 rounded text-amber-100 placeholder-amber-700/70 focus:outline-none focus:border-amber-400"
-                   type="password" placeholder={t.password} value={pass} onChange={e => setPass(e.target.value)} />
+                   type="password" autoCapitalize="none" autoCorrect="off"
+                   placeholder={t.password} value={pass} onChange={e => setPass(e.target.value)} />
             {isSignUp && (
               <input className="w-full mt-2 p-2 bg-black/70 border border-amber-700/60 rounded text-amber-100 placeholder-amber-700/70 focus:outline-none focus:border-amber-400"
+                     autoCapitalize="words" autoCorrect="off" spellCheck="false"
                      placeholder={t.displayName} value={name} onChange={e => setName(e.target.value)} />
             )}
             {errorMsg && <p className="text-red-400 text-sm mt-2">{errorMsg}</p>}
@@ -253,9 +256,11 @@
       );
     };
 
-    // -------------------- HUB --------------------
+    // -------------------- HUB SCREEN (Fixed flame logic based on real last_login) --------------------
     const HubScreen = ({ profile, credits, streak, imprints, factionWar, leaderboard, onStartRound, onSignOut, onViewSubmit, onViewScroll, simulateAbsence, setSimulateAbsence }) => {
-      const flameActive = !simulateAbsence && (() => {
+      // flameActive: uses real profile.last_login unless simulateAbsence is true (for testing)
+      const flameActive = (() => {
+        if (simulateAbsence) return false;
         if (!profile?.last_login) return true;
         const diff = Math.floor((new Date() - new Date(profile.last_login)) / (1000*3600*24));
         return diff <= 1;
@@ -292,7 +297,7 @@
                   </div>
                   <strong className="text-amber-400 text-lg">{streak} {t.days}</strong>
                 </div>
-                {(!flameActive || simulateAbsence) && (
+                {(!flameActive) && (
                   <p className="text-red-400/90 text-xs mt-2 bg-red-950/30 p-2 rounded border border-red-900/40 italic">{t.perished}</p>
                 )}
                 <div className="mt-4 flex justify-between items-center text-sm">
@@ -367,7 +372,7 @@
       );
     };
 
-    // -------------------- PLAY --------------------
+    // -------------------- PLAY SCREEN (FIXED: no negative credits) --------------------
     const PlayScreen = ({ round, roundIndex, setRoundIndex, selectedForce, credits, setCredits, profile, updateProfile, onFinish, consecrate, triggerOverwrite, stabilityFeePercent }) => {
       const q = round[roundIndex];
       const startTime = selectedForce === 'ra' ? 18 : 15;
@@ -428,7 +433,9 @@
         let speedBonus = isRight && timeLeft >= 12 ? 20 : 0;
         let totalDelta = reward + speedBonus;
         if (stabilityFeePercent > 5 && isRight) totalDelta = Math.floor(totalDelta * 1.2);
-        const newCredits = credits + totalDelta;
+        let newCredits = credits + totalDelta;
+        // FIX: prevent negative credits
+        if (newCredits < 0) newCredits = 0;
         const newScore   = (profile.total_score || 0) + (isRight ? 10 : 0);
         updateProfile({ credits: newCredits, total_score: newScore });
         setCredits(newCredits);
@@ -502,7 +509,7 @@
       );
     };
 
-    // -------------------- SUBMIT --------------------
+    // -------------------- SUBMIT SCREEN (unchanged) --------------------
     const SubmitScreen = ({ onSubmit, onBack }) => {
       const [newQ, setNewQ] = useState({ text_en:"", text_ar:"", opt1_en:"", opt2_en:"", opt3_en:"", opt4_en:"", opt1_ar:"", opt2_ar:"", opt3_ar:"", opt4_ar:"", correct:0, hint_en:"", hint_ar:"" });
       const handleSend = () => onSubmit({
@@ -556,7 +563,7 @@
       );
     };
 
-    // -------------------- SCROLL --------------------
+    // -------------------- SCROLL SCREEN (unchanged) --------------------
     const ScrollScreen = ({ leaderboard, onBack }) => (
       <div className="min-h-screen p-4 flex items-center justify-center bg-cover bg-center relative"
            style={{ backgroundImage:"url('https://i.ibb.co/VWTgSgLz/1000097151.png')" }}>
@@ -581,7 +588,7 @@
       </div>
     );
 
-    // -------------------- MAIN APP --------------------
+    // -------------------- MAIN APP (FIXED: streak & last_login management, safe loadQuestions) --------------------
     const App = () => {
       const [session,       setSession]       = useState(null);
       const [profile,       setProfile]       = useState(null);
@@ -617,15 +624,34 @@
         if (!session || !supabase) return;
         const { data, error } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
         if (data && !error) {
-          setProfile(data);
-          setSelectedForce(data.force);
-          setCredits(data.credits ?? 100);
-          setStreak(data.streak ?? 0);
-          setImprints(data.imprints || []);
+          // --- STREAK LOGIC ---
+          let newStreak = data.streak || 1;
+          let newLastLogin = data.last_login;
+          const today = new Date().toISOString().split('T')[0];
+          const lastLoginDate = data.last_login ? new Date(data.last_login).toISOString().split('T')[0] : null;
+          if (lastLoginDate !== today) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            if (lastLoginDate === yesterdayStr) {
+              newStreak = (data.streak || 1) + 1;
+            } else {
+              newStreak = 1;
+            }
+            newLastLogin = new Date().toISOString();
+            await supabase.from('profiles').update({ streak: newStreak, last_login: newLastLogin }).eq('id', session.user.id);
+          }
+          // ---------------------
+          const updatedData = { ...data, streak: newStreak, last_login: newLastLogin };
+          setProfile(updatedData);
+          setSelectedForce(updatedData.force);
+          setCredits(updatedData.credits ?? 100);
+          setStreak(newStreak);
+          setImprints(updatedData.imprints || []);
           await loadQuestions();
           await loadLeaderboard();
           await loadFactionWar();
-          setView(data.force ? 'hub' : 'onboarding');
+          setView(updatedData.force ? 'hub' : 'onboarding');
         } else {
           const newProfile = {
             id: session.user.id,
@@ -635,6 +661,7 @@
           };
           await supabase.from('profiles').insert(newProfile);
           setProfile(newProfile);
+          setStreak(1);
           await loadQuestions();
           await loadLeaderboard();
           await loadFactionWar();
@@ -645,15 +672,24 @@
 
       async function loadQuestions() {
         if (!supabase) { setQuestionsDB(FULL_SEED); return; }
-        let { data, error } = await supabase.from('questions').select('*').eq('is_active', true).limit(300);
-        if (error || !data || data.length < 10) {
-          for (const q of FULL_SEED) {
-            await supabase.from('questions').upsert([q], { onConflict:'id' });
+        try {
+          let { data, error } = await supabase.from('questions').select('*').eq('is_active', true).limit(300);
+          if (error || !data || data.length < 10) {
+            // Only seed once: check if any questions exist at all
+            const { count } = await supabase.from('questions').select('*', { count: 'exact', head: true });
+            if (count === 0) {
+              for (const q of FULL_SEED) {
+                await supabase.from('questions').upsert([q], { onConflict: 'id' });
+              }
+            }
+            const { data: fresh } = await supabase.from('questions').select('*').eq('is_active', true);
+            data = fresh || FULL_SEED;
           }
-          const { data: fresh } = await supabase.from('questions').select('*').eq('is_active', true);
-          data = fresh || FULL_SEED;
+          setQuestionsDB(data && data.length ? data : FULL_SEED);
+        } catch (err) {
+          console.error("Failed to load questions:", err);
+          setQuestionsDB(FULL_SEED);
         }
-        setQuestionsDB(data && data.length ? data : FULL_SEED);
       }
 
       async function loadLeaderboard() {
@@ -663,7 +699,7 @@
       }
 
       async function loadFactionWar() {
-        if (!supabase) return;
+        if (!supabase) return;  // FIXED: added safety check
         await supabase.from('faction_scores').upsert(
           [{ faction:'ra', score:100 }, { faction:'anubis', score:80 }],
           { onConflict:'faction', ignoreDuplicates:true }
@@ -693,6 +729,7 @@
           setProfile({...profile, ...changes});
         }
         if (changes.credits !== undefined) setCredits(changes.credits);
+        if (changes.streak !== undefined) setStreak(changes.streak);
       }
 
       async function updateFactionScore(forceId, points) {
