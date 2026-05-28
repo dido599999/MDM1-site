@@ -1,161 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>MDM1 · Rites of the Duat</title>
+  <title>بوابات الدوات · العودة للحياة</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet" />
   <style>
-    * { font-family: 'Cinzel', serif; }
-    body { background: #070303; }
-    .flame-animate { animation: flicker 0.3s infinite alternate; }
-    @keyframes flicker {
-      0%   { opacity: 0.8; text-shadow: 0 0 4px #d97706, 0 0 12px #b45309; }
-      100% { opacity: 1;   text-shadow: 0 0 16px #f59e0b, 0 0 24px #d97706; }
+    * { font-family: 'Cairo', 'Cinzel', serif; }
+    body { 
+      background: #050202; 
+      overflow-x: hidden;
     }
-    .shake { animation: shake 0.2s ease-in-out 0s 2; }
-    @keyframes shake {
-      0%   { transform: translateX(0); }
-      25%  { transform: translateX(-4px); }
-      75%  { transform: translateX(4px); }
-      100% { transform: translateX(0); }
+    
+    /* تأثير الشعلة الإلهية */
+    .flame-gold {
+      animation: flameGlow 1.5s infinite alternate;
     }
-    .cobweb-overlay { position: relative; overflow: hidden; }
-    .cobweb-overlay::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: repeating-linear-gradient(45deg, rgba(146, 64, 14, 0.15) 0px, rgba(146, 64, 14, 0.15) 2px, transparent 2px, transparent 8px);
-      pointer-events: none;
-      z-index: 10;
+    @keyframes flameGlow {
+      0% { text-shadow: 0 0 4px #d97706, 0 0 10px #b45309; opacity: 0.8; }
+      100% { text-shadow: 0 0 20px #f59e0b, 0 0 30px #d97706; opacity: 1; }
     }
-    .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    #root { min-height: 100vh; }
+
+    /* أنيميشن المقدمة السينمائية */
+    .cinematic-text {
+      animation: dynamicEntrance 4s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes dynamicEntrance {
+      0% { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(10px); }
+      30% { opacity: 1; filter: blur(0px); }
+      70% { opacity: 1; transform: scale(1); filter: blur(0px); }
+      100% { opacity: 0; transform: scale(1.05) translateY(-10px); filter: blur(5px); }
+    }
+
+    .fade-in-view {
+      animation: fadeInView 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeInView {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* تأثير الاهتزاز عند قرب انتهاء الوقت */
+    .time-shake { animation: lowTime 0.3s infinite alternate; }
+    @keyframes lowTime {
+      0% { transform: translateX(-2px) rotate(-0.5deg); }
+      100% { transform: translateX(2px) rotate(0.5deg); border-color: #ef4444; }
+    }
   </style>
 </head>
-<body class="text-gray-100 bg-[#070303] selection:bg-amber-800 selection:text-black">
-  <div id="root">
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#000">
-      <p style="color:#d97706;font-size:1.25rem;letter-spacing:0.2em" class="flame-animate">Awakening...</p>
-    </div>
-  </div>
+<body class="text-gray-100 bg-[#050202] selection:bg-amber-800 selection:text-black">
+  <div id="root"></div>
 
+  <!-- React Framework -->
   <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
 
   <script type="text/babel">
-    // -------------------- I18N الترجمة واللغة --------------------
-    const detectLang = () =>
-      (navigator.language || "en").toLowerCase().startsWith("ar") ? "ar" : "en";
-    const currentLang = detectLang();
-    const T = {
-      en: {
-        dir: "ltr", title: "RITES OF THE DUAT", subtitle: "Three trials. One eternal imprint.",
-        displayName: "Scribe Name",
-        choosePatron: "CHOOSE YOUR ANCIENT FORCE",
-        credits: "CREDITS", imprints: "IMPRINTS", torch: "RA'S TORCH", days: "days",
-        factionTitle: "SCROLL OF DESTINY", stabilityFee: "STABILITY FEE",
-        safeMode: "SAFE MODE", highRisk: "HIGH RISK", beginTrials: "BEGIN THE TRIALS",
-        hint: "WHISPER OF THE TEMPLE",
-        submitQuestion: "SUBMIT TO SCRIBES", backHub: "HUB",
-        leaderboardTitle: "ETERNAL SCRIBES", you: "you",
-        consecrate: "CONSECRATE", curse: "OVERWRITE (60)",
-        perished: "The high priests assumed you perished...",
-        loading: "Awakening...", timeFuse: "FUSE OF FATE",
-        rateLimit: "Max 3 questions per day reached!",
-        sealedOfRa: "Seal of the Council approved!", rejected: "Rejected by the Council.",
-        back: "Back", submit: "Submit",
-        disclaimer: "This game draws from Ancient Egyptian heritage as historical legacy. Truth belongs to the One."
-      },
-      ar: {
-        dir: "rtl", title: "طقوس العالم السفلي", subtitle: "ثلاث محن. بصمة أبدية.",
-        displayName: "اسم الكاتب",
-        choosePatron: "اختر قوتك القديمة",
-        credits: "ائتمانات", imprints: "بصمات", torch: "شُعلة رع", days: "أيام",
-        factionTitle: "لفافة المصير", stabilityFee: "رسوم الاستقرار",
-        safeMode: "نمط الأمان", highRisk: "خطر عالٍ", beginTrials: "ابدأ المحن",
-        hint: "همسة المعبد",
-        submitQuestion: "قدّم للكتبة", backHub: "القاعة الرئيسية",
-        leaderboardTitle: "الكتبة الأبديون", you: "أنت",
-        consecrate: "كرّس", curse: "استبدال (60)",
-        perished: "ظن الكهنة أنك هلكت...",
-        loading: "...الاستيقاظ", timeFuse: "فتيل المصير",
-        rateLimit: "تم بلوغ الحد الأقصى (3 أسئلة يومياً)!",
-        sealedOfRa: "ختم المجلس!", rejected: "رفضه المجلس.",
-        back: "رجوع", submit: "إرسال",
-        disclaimer: "هذه اللعبة تستلهم رموز الحضارة المصرية القديمة كتراث تاريخي. الحقيقة لله وحده."
-      }
-    };
-    const t = T[currentLang];
-    document.documentElement.dir = t.dir;
+    const { useState, useEffect, useRef, useCallback } = React;
 
-    // -------------------- SEED QUESTIONS الأسئلة --------------------
-    const FULL_SEED = [
-      { id:"seed1",  text_en:"Which ancient Egyptian symbol represents life?", text_ar:"أي رمز مصري قديم يمثل الحياة؟", options_en:["Ankh","Scarab","Eye of Horus","Pyramid"], options_ar:["عنخ","جعران","عين حورس","هرم"], correct:0, category:"egyptian", hint_en:"Cross with loop", hint_ar:"صليب بيد", is_active:true, submitted_by:"system" },
-      { id:"seed2",  text_en:"What is the underworld realm in Egyptian mythology called?", text_ar:"ما اسم العالم السفلي في الأساطير المصرية؟", options_en:["Aaru","Duat","Amenti","Khepri"], options_ar:["آرو","دوات","أمنتي","خبري"], correct:1, category:"egyptian", hint_en:"Where the sun travels at night", hint_ar:"حيث يسافر الشمس ليلاً", is_active:true, submitted_by:"system" },
-      { id:"seed3",  text_en:"Which pharaoh's tomb was found intact in 1922?", text_ar:"مقبرة أي فرعون وُجدت سليمة 1922؟", options_en:["Ramses II","Tutankhamun","Akhenaten","Khufu"], options_ar:["رمسيس الثاني","توت عنخ آمون","إخناتون","خوفو"], correct:1, category:"egyptian", hint_en:"Boy king", hint_ar:"الملك الطفل", is_active:true, submitted_by:"system" },
-      { id:"seed4",  text_en:"What does the Eye of Horus represent?", text_ar:"ماذا تمثل عين حورس؟", options_en:["War","Protection & health","Famine","Astronomy"], options_ar:["حرب","حماية وصحة","مجاعة","فلك"], correct:1, category:"egyptian", hint_en:"Amulet", hint_ar:"تميمة", is_active:true, submitted_by:"system" },
-      { id:"seed5",  text_en:"Which beetle symbolized rebirth in ancient Egypt?", text_ar:"أي خنفساء كانت ترمز للبعث في مصر القديمة؟", options_en:["Stag","Dung (Scarab)","Goliath","Click"], options_ar:["الأيل","الجعران","جولياث","نقر"], correct:1, category:"egyptian", hint_en:"Rolls the sun", hint_ar:"يدحرج الشمس", is_active:true, submitted_by:"system" },
-      { id:"seed6",  text_en:"Which ancient wonder was located at Alexandria?", text_ar:"أي عجائب الدنيا السبع كانت في الإسكندرية؟", options_en:["Pyramids","Lighthouse","Hanging Gardens","Colossus"], options_ar:["الأهرامات","المنارة","الحدائق المعلقة","التمثال"], correct:1, category:"egyptian", hint_en:"Guided ships", hint_ar:"وجه السفن", is_active:true, submitted_by:"system" }
+    // بنك أسئلة جديد تماماً ومتنوع (جغرافيا، علوم، تاريخ، ذكاء) لتجنب التكرار
+    const NEW_QUESTIONS_POOL = [
+      { id:"q1", text:"ما هو الكوكب الأقرب إلى الشمس في نظامنا الشمسي؟", options:["المريخ", "عطارد", "الزهرة", "المشتري"], correct:1, hint:"كوكب صغير جداً وليس لديه غلاف جوي سميك." },
+      { id:"q2", text:"أي من المحيطات التالية يعتبر الأكبر مساحة على وجه الأرض؟", options:["المحيط الأطلسي", "المحيط الهندي", "المحيط الهادئ", "المحيط المتجمد الشمالي"], correct:2, hint:"يغطي ما يقرب من ثلث مساحة سطح الأرض." },
+      { id:"q3", text:"ما هي العملة الرسمية المستخدمة في اليابان؟", options:["الين", "اليوان", "الووُن", "الدولار"], correct:0, hint:"يرمز له بالرمز ¥." },
+      { id:"q4", text:"ما هي المادة الأشد صلابة في الطبيعة؟", options:["الحديد", "الألماس", "الجرانيت", "التيتانيوم"], correct:1, hint:"تتكون بالكامل من عنصر الكربون تحت ضغط شديد." },
+      { id:"q5", text:"كم عدد صمامات قلب الإنسان البالغ؟", options:["صمامان", "3 صمامات", "4 صمامات", "5 صمامات"], correct:2, hint:"يتطابق عددها مع عدد حجرات القلب الأربعة." },
+      { id:"q6", text:"في أي عام سقط جدار برلين الشهير؟", options:["1985", "1989", "1991", "1993"], correct:1, hint:"قبل عامين فقط من تفكك الاتحاد السوفيتي." }
     ];
 
-    const { useState, useEffect, useMemo, useRef, useCallback } = React;
+    // ------------------- الشاشة السينمائية الأولى -------------------
+    const CinematicIntro = ({ onIntroEnd }) => {
+      useEffect(() => {
+        const timer = setTimeout(() => onIntroEnd(), 3800);
+        return () => clearTimeout(timer);
+      }, []);
 
-    const FlameIcon = ({ className }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className={className}>
-        <path d="M12 2c-2 4-4 6-4 9a4 4 0 0 0 8 0c0-3-2-5-4-9z" />
-        <path d="M12 22c-3 0-5-2-5-4 0-2 2-3 5-3s5 1 5 3-2 4-5 4z" />
-      </svg>
-    );
+      return (
+        <div className="min-h-screen bg-black flex flex-col items-center justify-center text-center p-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-cover bg-center opacity-20" 
+               style={{ backgroundImage: `url('https://images.unsplash.com/photo-1539650116574-8efeb43e2750?q=80&w=1200')` }} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black" />
+          
+          <div className="relative z-10 cinematic-text max-w-xl">
+            <h1 className="text-4xl md:text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-400 to-amber-700 font-serif mb-4">
+              طُقُوسُ العَالَمِ السُّفْلِيِّ
+            </h1>
+            <p className="text-amber-600/80 tracking-widest text-xs uppercase font-serif mb-8">MDM1 Org Dynamic Experience</p>
+            <div className="h-[1px] w-24 bg-amber-600 mx-auto my-4" />
+            <p className="text-stone-400 text-sm md:text-base leading-relaxed font-light">
+              "العدالة ميزان لا يخطئ، والكلمة المكتوبة لا تموت أبداً.. استعد لمواجهة قضاة الحقيقة."
+            </p>
+          </div>
+        </div>
+      );
+    };
 
-    // -------------------- ONBOARDING شاشة اختيار القوة عند البدء لأول مرة --------------------
+    // ------------------- شاشة اختيار اسم الكاتب والقوة -------------------
     const OnboardingScreen = ({ onSelectForce }) => {
       const [name, setName] = useState("");
       const forces = [
-        { id:"ra",     name:"Solar Radiance",   ability_en:"+3 seconds to timer",                  ability_ar:"+3 ثوانٍ للمؤقت",            icon:"☀️", bgImg:"https://images.unsplash.com/photo-1600577916048-804c9191e36c?q=80&w=600", desc_en:"Blessing of the Sun",  desc_ar:"بركة الشمس" },
-        { id:"anubis", name:"Scales of Truth",  ability_en:"Hide 2 wrong options once per round",  ability_ar:"إخفاء خيارين خاطئين",        icon:"⚰️", bgImg:"https://images.unsplash.com/photo-1600577916048-804c9191e36c?q=80&w=600", desc_en:"Weigher of Hearts",    desc_ar:"ميزان القلوب" },
-        { id:"isis",   name:"Shield of Wisdom", ability_en:"Revival shield for first wrong answer", ability_ar:"درع إحياء",                  icon:"🪶", bgImg:"https://images.unsplash.com/photo-1600577916048-804c9191e36c?q=80&w=600", desc_en:"Protector",            desc_ar:"الحامية" },
-        { id:"horus",  name:"Eye of Vigilance", ability_en:"Double credits on final correct",      ability_ar:"ضعف النقاط في السؤال الأخير", icon:"🦅", bgImg:"https://images.unsplash.com/photo-1600577916048-804c9191e36c?q=80&w=600", desc_en:"Watchful",             desc_ar:"الساهر" }
+        { id:"ra", name:"اشعاع رع الشمسي", desc:"+3 ثوانٍ إضافية للمؤقت", icon:"☀️", color:"from-amber-600 to-yellow-500" },
+        { id:"anubis", name:"ميزان أنوبيس", desc:"إخفاء خيارين خاطئين تلقائياً", icon:"⚖️", color:"from-stone-800 to-stone-950" },
+        { id:"isis", name:"درع إيزيس السحري", desc:"حماية وإحياء عند أول إجابة خاطئة", icon:"🪶", color:"from-teal-700 to-cyan-900" }
       ];
 
-      const handleSelect = (id) => {
-        const finalName = name.trim() || (currentLang === 'ar' ? 'كاتب مجهول' : 'Unknown Scribe');
-        onSelectForce(id, finalName);
-      };
-
       return (
-        <div className="min-h-screen py-12 px-4 bg-gradient-to-b from-neutral-950 via-stone-900 to-black flex flex-col justify-center items-center fade-in">
-          <div className="max-w-md w-full mb-8 text-center bg-stone-900/60 p-6 rounded-xl border border-amber-700/40">
-            <h2 className="text-amber-400 font-bold mb-2 tracking-widest">{t.displayName}</h2>
+        <div className="min-h-screen py-12 px-4 bg-cover bg-center relative flex flex-col justify-center items-center"
+             style={{ backgroundImage: `url('https://images.unsplash.com/photo-1600577916048-804c9191e36c?q=80&w=1200')` }}>
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
+
+          <div className="relative z-10 w-full max-w-xl bg-stone-900/80 p-6 rounded-2xl border border-amber-700/30 text-center shadow-2xl mb-8">
+            <h2 className="text-amber-400 font-bold mb-3 text-lg tracking-wider">اكتب اسمك في سجل الخالدين</h2>
             <input 
               type="text" 
-              className="w-full p-3 bg-black border border-amber-800 rounded text-center text-amber-100 focus:outline-none focus:border-amber-400 font-bold tracking-wider"
-              placeholder="𓁹 𓃠 𓅓"
+              className="w-full p-3 bg-black border border-amber-900 rounded-xl text-center text-amber-200 text-xl font-bold focus:outline-none focus:border-amber-500"
+              placeholder="اسم الكاتب..."
               value={name}
               onChange={e => setName(e.target.value)}
             />
           </div>
 
-          <h2 className="text-center text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 tracking-wider mb-2">{t.choosePatron}</h2>
-          <div className="w-16 h-0.5 bg-amber-600 mb-12" />
+          <h2 className="relative z-10 text-center text-xl md:text-2xl font-black text-amber-200 tracking-wide mb-6">اختر القوة التي تحميك داخل البوابة</h2>
           
-          <div className="flex flex-wrap justify-center gap-6 max-w-5xl">
+          <div className="relative z-10 flex flex-wrap justify-center gap-4 max-w-4xl w-full">
             {forces.map(f => (
-              <div key={f.id} onClick={() => handleSelect(f.id)}
-                   className="group cursor-pointer w-60 h-80 rounded-xl overflow-hidden relative border border-amber-700/50 hover:border-amber-400 bg-black shadow-xl transition-all duration-500 hover:-translate-y-2 flex flex-col justify-end p-4">
-                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-30"
-                     style={{ backgroundImage:`url('${f.bgImg}')` }} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                <div className="relative z-10 text-center">
-                  <div className="text-4xl mb-2 filter drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]">{f.icon}</div>
-                  <div className="text-xl font-bold text-amber-200">{f.name}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-amber-500 mt-0.5">{currentLang==='en' ? f.desc_en : f.desc_ar}</div>
-                  <div className="text-xs text-stone-300 mt-3 bg-black/80 backdrop-blur-sm p-2 rounded border border-amber-900/60 font-medium">
-                    {currentLang==='en' ? f.ability_en : f.ability_ar}
-                  </div>
-                </div>
+              <div key={f.id} onClick={() => onSelectForce(f.id, name.trim() || "كاتب مجهول")}
+                   className="cursor-pointer w-full sm:w-64 bg-gradient-to-b from-stone-900 to-black p-5 rounded-xl border border-stone-800 hover:border-amber-500 shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
+                <div className="text-4xl mb-3">{f.icon}</div>
+                <div className="text-base font-bold text-amber-400 mb-1">{f.name}</div>
+                <div className="text-xs text-stone-400 bg-stone-950/60 p-2 rounded-lg border border-stone-900">{f.desc}</div>
               </div>
             ))}
           </div>
@@ -163,439 +139,310 @@
       );
     };
 
-    // -------------------- HUB SCREEN القاعة الرئيسية --------------------
-    const HubScreen = ({ profile, credits, streak, imprints, factionWar, leaderboard, onStartRound, onViewSubmit, onViewScroll, simulateAbsence, setSimulateAbsence, onReset }) => {
-      const flameActive = !simulateAbsence;
-      const total = factionWar.ra + factionWar.anubis + 1;
-      const raPct = (factionWar.ra / total) * 100;
-
+    // ------------------- اللوحة الرئيسية (The Hub) -------------------
+    const HubScreen = ({ profile, onStart, onViewLeaderboard, onViewSubmit, onReset }) => {
       return (
-        <div className={`min-h-screen p-4 md:p-8 relative ${simulateAbsence ? 'cobweb-overlay' : ''} bg-[#0b0606] fade-in`}>
-          <div className="max-w-6xl mx-auto relative z-10">
-            
-            {/* الهيدر العلوي */}
-            <div className="flex flex-wrap gap-3 justify-between items-center border-b border-amber-800/40 pb-4">
-              <div className="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 flex items-center gap-2">
-                <span className="text-amber-600">𓃀</span> {profile.display_name} 
-                <span className="text-xs bg-amber-950 text-amber-400 px-2 py-0.5 rounded border border-amber-800/40 uppercase tracking-widest">{profile.force}</span>
+        <div className="min-h-screen bg-[#070404] text-right p-4 md:p-8 flex flex-col justify-between relative">
+          <div className="absolute inset-0 bg-cover bg-center opacity-5" 
+               style={{ backgroundImage: `url('https://images.unsplash.com/photo-1539650116574-8efeb43e2750?q=80&w=1200')` }} />
+          
+          <div className="max-w-5xl w-full mx-auto relative z-10">
+            {/* الهيدر */}
+            <div className="flex justify-between items-center border-b border-amber-900/30 pb-4 mb-8">
+              <div>
+                <h1 className="text-xl font-black text-amber-400">𓃀 {profile.display_name}</h1>
+                <p className="text-xs text-stone-500">القوة المفعلة: <span className="text-amber-600 font-bold">{profile.force}</span></p>
               </div>
-              <div className="flex items-center gap-3">
-                <button onClick={() => setSimulateAbsence(!simulateAbsence)}
-                        className="text-[10px] tracking-wider uppercase border border-stone-800 hover:border-amber-600 text-stone-400 hover:text-amber-400 px-3 py-1.5 rounded bg-black/40 transition-all">
-                  🐪 {simulateAbsence ? "Awake" : "Simulate 7d absence"}
-                </button>
-                <button onClick={onReset} className="text-stone-500 hover:text-red-400 transition-colors text-xs border border-stone-800 px-2 py-1 rounded">🔄 Reset</button>
+              <button onClick={onReset} className="text-xs bg-red-950/40 text-red-400 border border-red-900/50 px-3 py-1.5 rounded-lg hover:bg-red-900 hover:text-white transition-all">
+                إعادة ضبط الحساب 🔄
+              </button>
+            </div>
+
+            {/* بطاقات الإحصائيات الفعالة */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <div className="bg-stone-900/60 p-5 rounded-xl border border-stone-800">
+                <div className="text-xs text-stone-400 mb-1">شُعلة رع (النشاط اليومي)</div>
+                <div className="text-2xl font-bold text-amber-500 flame-gold">متوهجة 🔥 (3 أيام)</div>
+              </div>
+              <div className="bg-stone-900/60 p-5 rounded-xl border border-stone-800">
+                <div className="text-xs text-stone-400 mb-1">الائتمانات الحالية (Credits)</div>
+                <div className="text-2xl font-bold text-yellow-500">✨ {profile.credits} نقطة</div>
+              </div>
+              <div className="bg-stone-900/60 p-5 rounded-xl border border-stone-800">
+                <div className="text-xs text-stone-400 mb-1">البصمات الخالدة في السجل</div>
+                <div className="text-2xl font-bold text-cyan-500">𓋹 {profile.imprints?.length || 0} سؤال</div>
               </div>
             </div>
 
-            {/* الإحصائيات وبطاقات التحكم */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              
-              {/* شعلة رع والمؤشرات */}
-              <div className="bg-gradient-to-b from-stone-900/80 to-black/90 p-5 rounded-xl border border-amber-900/40 shadow-xl backdrop-blur-sm">
-                <div className="flex justify-between items-center border-b border-stone-800 pb-3">
-                  <div className="flex items-center gap-2">
-                    <FlameIcon className={flameActive ? 'flame-animate text-amber-500' : 'text-stone-700'} />
-                    <span className="text-sm font-bold tracking-wider">{t.torch}</span>
-                  </div>
-                  <strong className="text-amber-400 text-lg">{streak} {t.days}</strong>
-                </div>
-                {(!flameActive) && (
-                  <p className="text-red-400/90 text-xs mt-2 bg-red-950/30 p-2 rounded border border-red-900/40 italic">{t.perished}</p>
-                )}
-                <div className="mt-4 flex justify-between items-center text-sm">
-                  <span className="text-stone-400">{t.credits}:</span>
-                  <span className="font-bold text-yellow-500 text-base">✨ {credits}</span>
-                </div>
-                <div className="mt-1 flex justify-between items-center text-sm">
-                  <span className="text-stone-400">{t.imprints}:</span>
-                  <span className="font-bold text-amber-400 text-base">𓋹 {imprints.length}</span>
-                </div>
+            {/* قسم التحكم الرئيسي الفعال */}
+            <div className="bg-gradient-to-r from-amber-950/20 via-stone-900/60 to-transparent p-6 rounded-2xl border border-amber-900/40 text-center md:text-right flex flex-col md:flex-row justify-between items-center gap-6">
+              <div>
+                <h3 className="text-xl font-bold text-amber-200 mb-1">الاختبارات الكبرى جاهزة</h3>
+                <p className="text-xs text-stone-400">أجب عن 3 أسئلة متنوعة لتخليد اسمك في السجل والحصول على الائتمانات.</p>
               </div>
-
-              {/* لفافة المصير وحرب الفصائل */}
-              <div className="bg-gradient-to-b from-stone-900/80 to-black/90 p-5 rounded-xl border border-amber-900/40 shadow-xl backdrop-blur-sm">
-                <div className="text-sm font-bold tracking-wider text-amber-200 border-b border-stone-800 pb-3 uppercase">{t.factionTitle}</div>
-                <div className="w-full bg-stone-950 h-3 border border-amber-900/30 rounded-full mt-4 overflow-hidden">
-                  <div className="bg-gradient-to-r from-amber-600 to-yellow-500 h-full" style={{ width:`${raPct}%` }} />
-                </div>
-                <div className="flex justify-between text-[10px] tracking-wider font-bold mt-2 text-stone-400">
-                  <span>Solar Radiance</span><span>Scales of Truth</span>
-                </div>
-                <div className="mt-4 pt-2 border-t border-stone-800/60 flex justify-between text-xs text-stone-400">
-                  <span>{t.stabilityFee}: <span className="text-amber-500 font-bold">{factionWar.stabilityFee}%</span></span>
-                  <span className="uppercase tracking-widest font-bold text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/30">
-                    {factionWar.mode === 'safe' ? t.safeMode : t.highRisk}
-                  </span>
-                </div>
-              </div>
-
-              {/* زر بدء اللعب والتحكم الآخر */}
-              <div className="bg-gradient-to-b from-stone-900/40 to-black/80 p-5 rounded-xl border border-amber-800/30 flex flex-col justify-center gap-3">
-                <button onClick={onStartRound}
-                        className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 py-3 rounded-xl font-black text-black tracking-widest text-lg shadow-lg shadow-amber-950/50 transition-all duration-300">
-                  {t.beginTrials}
-                </button>
-                <div className="grid grid-cols-2 gap-2 mt-1">
-                  <button onClick={onViewSubmit}
-                          className="border border-amber-800/40 hover:border-amber-500 text-amber-400/90 hover:text-amber-200 py-2 rounded text-xs tracking-wider transition-colors bg-black/30 font-medium">
-                    {t.submitQuestion}
-                  </button>
-                  <button onClick={onViewScroll}
-                          className="border border-amber-800/40 hover:border-amber-500 text-amber-400/90 hover:text-amber-200 py-2 rounded text-xs tracking-wider transition-colors bg-black/30 font-medium">
-                    {t.leaderboardTitle}
-                  </button>
-                </div>
-              </div>
+              <button onClick={onStart} className="bg-gradient-to-l from-amber-600 to-amber-500 text-black font-black text-lg px-8 py-4 rounded-xl shadow-xl shadow-amber-950/50 hover:from-amber-500 hover:to-amber-400 transition-all transform hover:-translate-y-0.5">
+                دخول بوابة الاختبارات 𓁹
+              </button>
             </div>
 
-            {/* المتصدرين الأبديين */}
-            <div className="mt-8 bg-black/40 border border-stone-900 rounded-xl p-5 shadow-2xl">
-              <h3 className="text-amber-400 font-bold tracking-wider border-b border-stone-800 pb-2 mb-4 uppercase flex items-center gap-2">
-                <span>🏆</span> {t.leaderboardTitle}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                {leaderboard.map((p, i) => (
-                  <div key={i}
-                       className={`flex justify-between items-center border-b border-stone-950 py-2 text-sm ${p.display_name===profile.display_name ? 'bg-amber-950/20 px-2 rounded border border-amber-900/30 text-amber-300 font-bold' : ''}`}>
-                    <span className="flex items-center gap-2 text-stone-300">
-                      <span className="text-xs text-stone-600 font-mono w-4">{i+1}.</span> {p.display_name}
-                      {p.display_name===profile.display_name && (
-                        <span className="text-[10px] tracking-widest uppercase bg-amber-600 text-black px-1 rounded font-black">{t.you}</span>
-                      )}
-                    </span>
-                    <span className="font-mono font-bold text-amber-400">{p.total_score}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-12 text-center text-[11px] text-stone-600 border-t border-stone-900 pt-6 leading-relaxed font-medium tracking-wide max-w-2xl mx-auto">
-              {t.disclaimer}
+            {/* الأزرار الفرعية الفعالة */}
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <button onClick={onViewSubmit} className="bg-stone-900/40 border border-stone-800 p-4 rounded-xl text-center hover:border-amber-700/50 text-stone-300 transition-all">
+                ✍️ تقديم سؤال جديد للمجلس
+              </button>
+              <button onClick={onViewLeaderboard} className="bg-stone-900/40 border border-stone-800 p-4 rounded-xl text-center hover:border-amber-700/50 text-stone-300 transition-all">
+                🏆 عرض لوحة المتصدرين الفعليين
+              </button>
             </div>
           </div>
+
+          <p className="text-center text-[10px] text-stone-600 max-w-xl mx-auto mt-12">
+            تم استلهام الرموز من التراث التاريخي للموقع الأصلي. جميع الحقوق محفوظة لـ MDM1 Org 2026.
+          </p>
         </div>
       );
     };
 
-    // -------------------- PLAY SCREEN شاشة الأسئلة والمحاكمة --------------------
-    const PlayScreen = ({ round, roundIndex, setRoundIndex, selectedForce, credits, setCredits, profile, updateProfile, onFinish, consecrate, triggerOverwrite, stabilityFeePercent }) => {
-      const q = round[roundIndex];
-      const startTime = selectedForce === 'ra' ? 18 : 15;
-      const [timeLeft, setTimeLeft] = useState(startTime);
+    // ------------------- شاشة اللعب الفعلي -------------------
+    const PlayScreen = ({ round, onFinish, profile, setProfile }) => {
+      const [idx, setIdx] = useState(0);
+      const [timeLeft, setTimeLeft] = useState(profile.force === 'ra' ? 18 : 15);
       const [answered, setAnswered] = useState(false);
-      const [shake, setShake]       = useState(false);
-      const [usedAnubis, setUsedAnubis] = useState(false);
-      const [hiddenWrong, setHiddenWrong] = useState(false);
-      const [qOwner, setQOwner]     = useState(null);
+      const [chosen, setChosen] = useState(null);
       const timerRef = useRef(null);
 
+      const currentQuestion = round[idx];
+
       useEffect(() => {
-        setTimeLeft(startTime);
+        setTimeLeft(profile.force === 'ra' ? 18 : 15);
         setAnswered(false);
-        setHiddenWrong(false);
-        setQOwner(q?.submitted_by !== "system" ? q?.submitted_by : null);
-        setShake(false);
-      }, [roundIndex, q]);
+        setChosen(null);
+      }, [idx, profile.force]);
 
       useEffect(() => {
         if (answered) return;
-        clearInterval(timerRef.current);
         timerRef.current = setInterval(() => {
-          setTimeLeft(prev => {
-            if (prev <= 1) {
+          setTimeLeft(p => {
+            if (p <= 1) {
               clearInterval(timerRef.current);
+              handleSelectAnswer(-1); // انتهاء الوقت يعامل كإجابة خاطئة
               return 0;
             }
-            if (prev <= 5) setShake(true);
-            return prev - 1;
+            return p - 1;
           });
         }, 1000);
         return () => clearInterval(timerRef.current);
-      }, [answered, roundIndex]);
+      }, [answered, idx]);
 
-      useEffect(() => {
-        if (timeLeft === 0 && !answered) handleAnswer(-1);
-      }, [timeLeft]);
-
-      const handleAnswer = useCallback((chosenIdx) => {
+      const handleSelectAnswer = (selectedIdx) => {
         if (answered) return;
         setAnswered(true);
+        setChosen(selectedIdx);
         clearInterval(timerRef.current);
-        setShake(false);
 
-        const isRight = chosenIdx === q.correct;
-        let reward = isRight ? 10 : -5;
-        let speedBonus = isRight && timeLeft >= 12 ? 20 : 0;
-        let totalDelta = reward + speedBonus;
-        if (stabilityFeePercent > 5 && isRight) totalDelta = Math.floor(totalDelta * 1.2);
-        
-        let newCredits = credits + totalDelta;
-        if (newCredits < 0) newCredits = 0;
-        
-        const newScore = (profile.total_score || 0) + (isRight ? 10 : 0);
-        updateProfile({ credits: newCredits, total_score: newScore });
-        setCredits(newCredits);
+        const isCorrect = selectedIdx === currentQuestion.correct;
+        let pointsDelta = isCorrect ? 15 : -5;
+        let newCredits = Math.max(0, profile.credits + pointsDelta);
+        let newScore = profile.total_score + (isCorrect ? 10 : 0);
+
+        const updatedProfile = { ...profile, credits: newCredits, total_score: newScore };
+        setProfile(updatedProfile);
+        localStorage.setItem("duat_profile", JSON.stringify(updatedProfile));
 
         setTimeout(() => {
-          if (isRight) {
-            if (qOwner) {
-              if (qOwner !== profile.display_name && newCredits >= 60) {
-                if (window.confirm(`${t.curse} occupied by ${qOwner}?`)) triggerOverwrite(q.id, qOwner);
-              }
-            } else {
-              const cost = stabilityFeePercent > 5 ? 40 : 30;
-              if (newCredits >= cost && window.confirm(`${t.consecrate} (${cost} credits)?`)) consecrate(q.id, cost);
-            }
+          if (idx + 1 < round.length) {
+            setIdx(idx + 1);
+          } else {
+            onFinish();
           }
-          if (roundIndex + 1 < round.length) setRoundIndex(prev => prev + 1);
-          else onFinish();
-        }, 1200);
-      }, [answered, q, credits, timeLeft, qOwner, roundIndex, round.length]);
+        }, 1500);
+      };
 
-      const isHintLie = useMemo(() => Math.random() < 0.2, [q?.id]);
-      const hintText  = q ? (q[`hint_${currentLang}`] || q.hint_en) : "";
-      const displayHint = isHintLie ? (currentLang==='en' ? "Deception: maybe false" : "خداع: ربما كاذب") : hintText;
-      const forceIcons  = { ra:"☀️ Solar Radiance", anubis:"⚰️ Scales of Truth", isis:"🪶 Shield of Wisdom", horus:"🦅 Eye of Vigilance" };
-
-      if (!q) return null;
-      const options = currentLang === 'en' ? q.options_en : q.options_ar;
+      if (!currentQuestion) return null;
 
       return (
-        <div className={`min-h-screen p-4 flex items-center justify-center bg-[#070303] relative ${shake ? 'shake' : ''}`}>
-          <div className="max-w-2xl w-full bg-stone-900/90 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-amber-800/40 shadow-2xl relative z-10 fade-in">
-            <div className="flex justify-between items-center text-[10px] tracking-widest font-bold text-stone-400 uppercase mb-2">
-              <span className="text-amber-500">🛡️ {forceIcons[selectedForce] || "Ancient Force"}</span>
-              {qOwner && <span className="text-red-400 bg-red-950/40 px-2 py-0.5 rounded border border-red-900/30">📜 Owner: {qOwner}</span>}
+        <div className="min-h-screen p-4 flex items-center justify-center bg-[#070505]">
+          <div className={`max-w-xl w-full bg-stone-900/90 p-6 md:p-8 rounded-2xl border border-stone-800 shadow-2xl transition-all ${timeLeft <= 5 ? 'time-shake' : ''}`}>
+            
+            <div className="flex justify-between items-center border-b border-stone-800 pb-3 mb-6">
+              <span className="text-xs font-bold text-stone-400">السؤال {idx + 1} من {round.length}</span>
+              <span className={`text-sm font-mono font-bold ${timeLeft <= 5 ? 'text-red-500 flame-gold' : 'text-amber-500'}`}>
+                ⏳ الفتيل الزمني: {timeLeft} ثانية
+              </span>
             </div>
-            <div className="flex justify-between items-center text-xs tracking-widest font-bold text-stone-400 uppercase">
-              <span>🔥 {t.timeFuse}</span>
-              <span className={timeLeft <= 4 ? 'text-red-500 flame-animate' : ''}>{timeLeft}s</span>
-            </div>
-            <div className="w-full h-2 bg-stone-950 border border-stone-900 rounded-full mt-2 overflow-hidden shadow-inner">
-              <div className="h-full bg-gradient-to-r from-amber-600 to-yellow-400 transition-all duration-1000 rounded-full"
-                   style={{ width:`${(timeLeft/startTime)*100}%` }} />
-            </div>
-            <div className="text-xl md:text-2xl my-8 font-bold leading-relaxed text-amber-100 border-l-2 md:border-l-4 border-amber-500 pl-4">
-              {currentLang==='en' ? q.text_en : q.text_ar}
-            </div>
-            <div className="grid grid-cols-1 gap-3 mt-6">
-              {options
-                .map((opt, idx) => ({opt, idx}))
-                .filter(({idx}) => !(selectedForce==='anubis' && hiddenWrong && idx !== q.correct && idx % 2 === 0))
-                .map(({opt, idx}) => (
-                  <button key={idx} onClick={() => handleAnswer(idx)} disabled={answered}
-                          className="bg-black/40 border border-stone-800 text-stone-300 p-3.5 rounded-xl hover:bg-amber-950/40 hover:border-amber-600 disabled:opacity-60 text-left text-sm font-medium tracking-wide transition-all duration-200">
+
+            <h2 className="text-lg md:text-xl font-bold text-amber-100 mb-6 leading-relaxed">
+              {currentQuestion.text}
+            </h2>
+
+            <div className="grid grid-cols-1 gap-3">
+              {currentQuestion.options.map((opt, i) => {
+                let btnStyle = "bg-black/40 border border-stone-800 text-stone-300 hover:border-amber-600 hover:bg-amber-950/20";
+                if (answered) {
+                  if (i === currentQuestion.correct) btnStyle = "bg-green-950/80 border-green-500 text-green-200 font-bold";
+                  else if (i === chosen) btnStyle = "bg-red-950/80 border-red-500 text-red-200";
+                  else btnStyle = "opacity-40 bg-black/20 border-stone-900 text-stone-500";
+                }
+
+                return (
+                  <button key={i} disabled={answered} onClick={() => handleSelectAnswer(i)}
+                          className={`w-full p-4 rounded-xl text-right text-sm transition-all duration-200 ${btnStyle}`}>
                     {opt}
                   </button>
-                ))
-              }
+                );
+              })}
             </div>
-            {selectedForce==='anubis' && !usedAnubis && !hiddenWrong && (
-              <button onClick={() => { setHiddenWrong(true); setUsedAnubis(true); }}
-                      className="mt-4 text-xs tracking-wider uppercase font-bold text-amber-400 bg-amber-950/60 border border-amber-800 px-3 py-2 rounded-xl transition-colors">
-                🔮 Hide wrong options (Scales of Truth)
-              </button>
-            )}
-            <div className="mt-6 p-3 bg-black/60 rounded-xl italic border-l-4 border-amber-600 text-xs md:text-sm tracking-wide text-stone-400">
-              <span className="text-amber-500 not-italic font-black uppercase mr-1">𓋹 {t.hint}:</span> {displayHint}
+
+            <div className="mt-6 p-3 bg-black/60 rounded-xl border-r-4 border-amber-600 text-xs text-stone-400 leading-relaxed">
+              <span className="text-amber-500 font-bold ml-1">𓋹 همسة المعبد:</span> {currentQuestion.hint}
             </div>
+
           </div>
         </div>
       );
     };
 
-    // -------------------- SUBMIT SCREEN تقديم سؤال --------------------
-    const SubmitScreen = ({ onSubmit, onBack }) => {
-      const [newQ, setNewQ] = useState({ text_en:"", text_ar:"", opt1_en:"", opt2_en:"", opt3_en:"", opt4_en:"", opt1_ar:"", opt2_ar:"", opt3_ar:"", opt4_ar:"", correct:0, hint_en:"", hint_ar:"" });
-      const handleSend = () => {
-        if(!newQ.text_en || !newQ.text_ar) { alert("Please complete the fields"); return; }
-        onSubmit({
-          id:`user_${Date.now()}`, text_en:newQ.text_en, text_ar:newQ.text_ar,
-          options_en:[newQ.opt1_en || "A", newQ.opt2_en || "B", newQ.opt3_en || "C", newQ.opt4_en || "D"],
-          options_ar:[newQ.opt1_ar || "أ", newQ.opt2_ar || "ب", newQ.opt3_ar || "ج", newQ.opt4_ar || "د"],
-          correct:parseInt(newQ.correct)||0, hint_en:newQ.hint_en || "Hint", hint_ar:newQ.hint_ar || "تلميح", category:"user", is_active:true
+    // ------------------- شاشة إضافة سؤال جديد الفعالة -------------------
+    const SubmitScreen = ({ onBack, onAddQuestion }) => {
+      const [text, setText] = useState("");
+      const [opts, setOpts] = useState(["", "", "", ""]);
+      const [correct, setCorrect] = useState(0);
+
+      const handleSave = () => {
+        if (!text || opts.some(o => !o)) { alert("برجاء ملء السؤال وجميع الاختيارات الأربعة!"); return; }
+        onAddQuestion({
+          id: `user_${Date.now()}`,
+          text: text,
+          options: opts,
+          correct: parseInt(correct),
+          hint: "سؤال مضاف بواسطة أحد كتبة المعبد."
         });
+        alert("تم تسليم سؤالك بنجاح ومراجعته من مجلس رع! تم إدراجه في اللعبة.");
+        onBack();
       };
+
       return (
-        <div className="min-h-screen p-4 flex items-center justify-center bg-[#070303]">
-          <div className="max-w-2xl w-full bg-stone-900/90 backdrop-blur-md p-6 rounded-xl border border-amber-700/60 shadow-2xl relative z-10 fade-in">
-            <h2 className="text-2xl font-bold text-amber-400 tracking-wider mb-4 border-b border-stone-800 pb-2">{t.submitQuestion}</h2>
-            <textarea placeholder="English question"
-                      className="w-full p-2.5 bg-black text-stone-200 rounded border border-stone-800 focus:outline-none focus:border-amber-600 text-sm my-2"
-                      onChange={e => setNewQ({...newQ, text_en:e.target.value})} />
-            <textarea placeholder="السؤال بالعربية"
-                      className="w-full p-2.5 bg-black text-stone-200 rounded border border-stone-800 focus:outline-none focus:border-amber-600 text-sm my-2"
-                      onChange={e => setNewQ({...newQ, text_ar:e.target.value})} />
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {[1,2,3,4].map(n => (
-                <input key={`en${n}`} placeholder={`EN option ${n}`}
-                       className="p-2 bg-black text-stone-200 rounded border border-stone-800 text-xs"
-                       onChange={e => setNewQ({...newQ, [`opt${n}_en`]:e.target.value})} />
-              ))}
-              {[1,2,3,4].map(n => (
-                <input key={`ar${n}`} placeholder={`خيار ${n}`}
-                       className="p-2 bg-black text-stone-200 rounded border border-stone-800 text-xs"
-                       onChange={e => setNewQ({...newQ, [`opt${n}_ar`]:e.target.value})} />
+        <div className="min-h-screen p-4 flex items-center justify-center bg-[#090606]">
+          <div className="max-w-xl w-full bg-stone-900 p-6 rounded-2xl border border-amber-900/30 shadow-2xl fade-in-view">
+            <h2 className="text-xl font-bold text-amber-400 border-b border-stone-800 pb-2 mb-4">نقش سؤال جديد في لفافة المصير</h2>
+            
+            <label className="text-xs text-stone-400 block mb-1">نص السؤال:</label>
+            <textarea className="w-full p-3 bg-black border border-stone-800 text-amber-100 rounded-xl text-sm mb-4 focus:outline-none focus:border-amber-600"
+                      rows="3" placeholder="اكتب سؤالك هنا..." value={text} onChange={e => setText(e.target.value)} />
+
+            <label className="text-xs text-stone-400 block mb-1">الاختيارات الأربعة:</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+              {opts.map((o, i) => (
+                <input key={i} type="text" placeholder={`خيار رقم ${i+1}`} value={o}
+                       className="p-2.5 bg-black border border-stone-800 text-sm rounded-lg text-stone-300 focus:outline-none focus:border-amber-600"
+                       onChange={e => {
+                         const copy = [...opts];
+                         copy[i] = e.target.value;
+                         setOpts(copy);
+                       }} />
               ))}
             </div>
-            <div className="mt-3 flex items-center gap-2 text-xs text-stone-400">
-              <span>Correct option index (0-3):</span>
-              <input type="number" min="0" max="3" defaultValue="0"
-                     className="w-16 p-1 bg-black text-stone-200 rounded border border-stone-800 text-center"
-                     onChange={e => setNewQ({...newQ, correct:e.target.value})} />
+
+            <div className="mb-6 flex justify-between items-center bg-black/40 p-3 rounded-xl border border-stone-800">
+              <span className="text-xs text-stone-400">مؤشر الإجابة الصحيحة:</span>
+              <select className="bg-stone-900 text-amber-400 p-1.5 rounded border border-stone-700 text-xs"
+                      value={correct} onChange={e => setCorrect(e.target.value)}>
+                <option value={0}>الخيار الأول هو الصحيح</option>
+                <option value={1}>الخيار الثاني هو الصحيح</option>
+                <option value={2}>الخيار الثالث هو الصحيح</option>
+                <option value={3}>الخيار الرابع هو الصحيح</option>
+              </select>
             </div>
-            <div className="flex gap-2 mt-4">
-              <button onClick={handleSend}
-                      className="bg-gradient-to-r from-amber-600 to-amber-500 text-black font-bold tracking-widest px-6 py-2 rounded-xl text-xs">
-                {t.submit}
-              </button>
-              <button onClick={onBack}
-                      className="border border-stone-800 text-stone-400 px-4 py-2 rounded-xl text-xs">
-                {t.backHub}
-              </button>
+
+            <div className="flex gap-2">
+              <button onClick={handleSave} className="bg-amber-600 text-black font-bold px-6 py-2.5 rounded-xl text-xs hover:bg-amber-500 transition-all">حفظ ونقش السؤال</button>
+              <button onClick={onBack} className="bg-stone-800 text-stone-400 px-4 py-2.5 rounded-xl text-xs hover:bg-stone-700">رجوع للقاعة</button>
             </div>
           </div>
         </div>
       );
     };
 
-    // -------------------- SCROLL SCREEN قائمة المتصدرين الكاملة --------------------
-    const ScrollScreen = ({ leaderboard, onBack }) => (
-      <div className="min-h-screen p-4 flex items-center justify-center bg-[#070303]">
-        <div className="bg-stone-900/90 max-w-xl w-full p-6 rounded-xl border border-amber-700/60 shadow-2xl relative z-10 fade-in">
-          <h2 className="text-2xl font-bold text-amber-400 tracking-wider border-b border-stone-800 pb-2 mb-4 uppercase">{t.leaderboardTitle}</h2>
-          <ul className="divide-y divide-stone-800">
-            {leaderboard.map((p, idx) => (
-              <li key={idx} className="py-2.5 flex justify-between items-center text-sm text-stone-300">
-                <span><span className="text-stone-600 mr-2">{idx+1}.</span> {p.display_name}</span>
-                <span className="font-mono font-bold text-amber-500">{p.total_score}</span>
-              </li>
+    // ------------------- شاشة لوحة الصدارة الفعالة -------------------
+    const LeaderboardScreen = ({ onBack, list }) => (
+      <div className="min-h-screen p-4 flex items-center justify-center bg-[#090606]">
+        <div className="max-w-md w-full bg-stone-900 p-6 rounded-2xl border border-amber-900/30 shadow-2xl text-right fade-in-view">
+          <h2 className="text-xl font-bold text-amber-400 border-b border-stone-800 pb-2 mb-4">سجل الكتبة الأبديين 🏆</h2>
+          <div className="divide-y divide-stone-800">
+            {list.map((p, idx) => (
+              <div key={idx} className="py-3 flex justify-between items-center text-sm">
+                <span className="text-stone-300 font-medium">
+                  <span className="text-xs text-stone-600 font-mono ml-2">#{idx+1}</span> {p.display_name}
+                </span>
+                <span className="font-mono font-bold text-amber-500">{p.total_score} نقطة مجد</span>
+              </div>
             ))}
-          </ul>
-          <button onClick={onBack}
-                  className="mt-6 border border-stone-800 text-stone-400 hover:text-amber-400 px-5 py-2 rounded-xl text-xs uppercase font-bold transition-all bg-black/20">
-            {t.backHub}
+          </div>
+          <button onClick={onBack} className="w-full mt-6 bg-stone-800 text-stone-400 py-3 rounded-xl text-xs font-bold hover:bg-stone-700 transition-all">
+            العودة للرئيسية
           </button>
         </div>
       </div>
     );
 
-    // -------------------- MAIN APP المتحكم الأساسي الخالي من السيرفر --------------------
-    const App = () => {
-      const [profile,       setProfile]       = useState(null);
-      const [loading,       setLoading]       = useState(true);
-      const [view,          setView]          = useState('onboarding');
-      const [questionsDB,   setQuestionsDB]   = useState(FULL_SEED);
-      const [currentRound,  setCurrentRound]  = useState([]);
-      const [roundIndex,    setRoundIndex]    = useState(0);
-      const [credits,       setCredits]       = useState(100);
-      const [imprints,      setImprints]      = useState([]);
-      const [streak,        setStreak]        = useState(3);
-      const [simulateAbsence, setSimulateAbsence] = useState(false);
-
-      const factionWar = { ra: 145, anubis: 120, mode: 'safe', stabilityFee: 3 };
-      
-      const leaderboard = [
-        { display_name: "High Priest Amenhotep", total_score: 280 },
-        { display_name: "Scribe Nefertari", total_score: 210 },
-        { display_name: profile?.display_name || "You", total_score: profile?.total_score || 0 },
-        { display_name: "Thoth_Follower", total_score: 150 },
-        { display_name: "Cleopatra_X", total_score: 90 }
-      ].sort((a,b) => b.total_score - a.total_score);
+    // ------------------- التطبيق والمتحكم الفعلي -------------------
+    const MainApp = () => {
+      const [view, setView] = useState('intro'); // شاشة البداية السينمائية أولاً
+      const [profile, setProfile] = useState(null);
+      const [questionsDB, setQuestionsDB] = useState(NEW_QUESTIONS_POOL);
+      const [activeRound, setActiveRound] = useState([]);
 
       useEffect(() => {
-        // تحميل البيانات محلياً من المتصفح لعدم الحاجة لـ Supabase
-        const saved = localStorage.getItem("duat_profile");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          setProfile(parsed);
-          setCredits(parsed.credits);
-          setImprints(parsed.imprints || []);
-          setView('hub');
+        const localData = localStorage.getItem("duat_profile_v2");
+        if (localData) {
+          setProfile(JSON.parse(localData));
         }
-        setLoading(false);
       }, []);
 
+      const handleIntroEnd = () => {
+        setView(profile ? 'hub' : 'onboarding');
+      };
+
       const handleSelectForce = (forceId, scribeName) => {
-        const p = { display_name: scribeName, force: forceId, total_score: 0, credits: 100, imprints: [] };
-        setProfile(p);
-        setCredits(100);
-        setImprints([]);
-        localStorage.setItem("duat_profile", JSON.stringify(p));
+        const initProfile = { display_name: scribeName, force: forceId, credits: 100, total_score: 0, imprints: [] };
+        setProfile(initProfile);
+        localStorage.setItem("duat_profile_v2", JSON.stringify(initProfile));
         setView('hub');
       };
 
-      const startNewRound = () => {
+      const startRound = () => {
         const shuffled = [...questionsDB].sort(() => 0.5 - Math.random());
-        setCurrentRound(shuffled.slice(0, 3));
-        setRoundIndex(0);
+        setActiveRound(shuffled.slice(0, 3));
         setView('play');
       };
 
-      const updateProfile = (changes) => {
-        const updated = { ...profile, ...changes };
-        setProfile(updated);
-        localStorage.setItem("duat_profile", JSON.stringify(updated));
-      };
-
-      const consecrate = (questionId, cost) => {
-        const nextCredits = credits - cost;
-        const nextImprints = [...imprints, questionId];
-        setCredits(nextCredits);
-        setImprints(nextImprints);
-        updateProfile({ credits: nextCredits, imprints: nextImprints });
-        alert(`✨ Confirmed! This truth belongs to you.`);
-      };
-
-      const triggerOverwrite = (questionId, currentOwner) => {
-        const nextCredits = credits - 60;
-        setCredits(nextCredits);
-        updateProfile({ credits: nextCredits });
-        alert(`🔥 Overwritten! You captured the seal of ${currentOwner}.`);
-      };
-
-      const submitNewQuestion = (qData) => {
-        setQuestionsDB([...questionsDB, qData]);
-        alert(t.sealedOfRa);
-        setView('hub');
-      };
-
       const handleReset = () => {
-        localStorage.removeItem("duat_profile");
+        localStorage.removeItem("duat_profile_v2");
         setProfile(null);
         setView('onboarding');
       };
 
-      if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-black">
-          <p className="text-amber-500 text-xl tracking-widest flame-animate">{t.loading}</p>
-        </div>
-      );
+      const addNewQuestion = (newQ) => {
+        setQuestionsDB([newQ, ...questionsDB]);
+      };
 
+      const mockLeaderboard = [
+        { display_name: "كبير الكهنة آمنحوتب", total_score: 250 },
+        { display_name: "الكاتبة نفرتاري", total_score: 190 },
+        { display_name: profile?.display_name || "أنت", total_score: profile?.total_score || 0 },
+        { display_name: "حكيم المعبد", total_score: 110 }
+      ].sort((a,b) => b.total_score - a.total_score);
+
+      if (view === 'intro') return <CinematicIntro onIntroEnd={handleIntroEnd} />;
       if (view === 'onboarding') return <OnboardingScreen onSelectForce={handleSelectForce} />;
-      if (view === 'hub')        return (
-        <HubScreen profile={profile} credits={credits} streak={streak} imprints={imprints}
-          factionWar={factionWar} leaderboard={leaderboard}
-          onStartRound={startNewRound}
-          onViewSubmit={() => setView('submit')} onViewScroll={() => setView('scroll')}
-          simulateAbsence={simulateAbsence} setSimulateAbsence={setSimulateAbsence}
-          onReset={handleReset} />
-      );
-      if (view === 'play') return (
-        <PlayScreen round={currentRound} roundIndex={roundIndex} setRoundIndex={setRoundIndex}
-          selectedForce={profile?.force} credits={credits} setCredits={setCredits}
-          profile={profile} updateProfile={updateProfile}
-          onFinish={() => setView('hub')}
-          consecrate={consecrate} triggerOverwrite={triggerOverwrite}
-          stabilityFeePercent={factionWar.stabilityFee} />
-      );
-      if (view === 'submit') return <SubmitScreen onSubmit={submitNewQuestion} onBack={() => setView('hub')} />;
-      if (view === 'scroll') return <ScrollScreen leaderboard={leaderboard} onBack={() => setView('hub')} />;
+      if (view === 'hub') return <HubScreen profile={profile} onStart={startRound} onReset={handleReset} onViewLeaderboard={() => setView('leaderboard')} onViewSubmit={() => setView('submit')} />;
+      if (view === 'play') return <PlayScreen round={activeRound} profile={profile} setProfile={setProfile} onFinish={() => setView('hub')} />;
+      if (view === 'submit') return <SubmitScreen onBack={() => setView('hub')} onAddQuestion={addNewQuestion} />;
+      if (view === 'leaderboard') return <LeaderboardScreen onBack={() => setView('hub')} list={mockLeaderboard} />;
       return null;
     };
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    ReactDOM.createRoot(document.getElementById("root")).render(<MainApp />);
   </script>
 </body>
 </html>
