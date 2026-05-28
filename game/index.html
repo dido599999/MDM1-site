@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>MDM1 · Rites of the Duat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Cinzel', serif; }
+    body { background: #0a0505; }
+    .flame-animate { animation: flicker 0.3s infinite alternate; }
+    @keyframes flicker {
+      0%   { opacity: 0.8; text-shadow: 0 0 2px #ff9900; }
+      100% { opacity: 1;   text-shadow: 0 0 12px #ff6600; }
+    }
+    .shake { animation: shake 0.2s ease-in-out 0s 2; }
+    @keyframes shake {
+      0%   { transform: translateX(0); }
+      25%  { transform: translateX(-4px); }
+      75%  { transform: translateX(4px); }
+      100% { transform: translateX(0); }
+    }
+    .cobweb-overlay { position: relative; overflow: hidden; }
+    .cobweb-overlay::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, rgba(80,70,50,0.3) 0px, rgba(80,70,50,0.3) 2px, transparent 2px, transparent 8px);
+      pointer-events: none;
+      z-index: 10;
+    }
+    .fade-in { animation: fadeIn 0.5s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    #root { min-height: 100vh; }
+  </style>
+</head>
+<body class="text-gray-200">
+  <div id="root">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#000">
+      <p style="color:#d97706;font-size:1.25rem;letter-spacing:0.2em" class="flame-animate">Awakening...</p>
+    </div>
+  </div>
+
+  <!-- 1. React -->
+  <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <!-- 2. Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+  <!-- 3. Babel LAST -->
+  <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
+
+  <script type="text/babel">
+    // =====================================================================
+    // MDM1 · Rites of the Duat — single-file React app (FULLY FIXED)
+    // =====================================================================
+
+    // -------------------- SUPABASE --------------------
+    const SUPABASE_URL = "https://tdbsneluizbpcipdoaez.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkYnNuZWx1aXpicGNpcGRvYWV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzgxODksImV4cCI6MjA5NTU1NDE4OX0.ytJBAZ97AszdD97ev7AJwHk8tDl1dAGTxPj4XvebtcM";
+
+    let supabase;
+    try {
+      const { createClient } = window.supabase;
+      supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch(e) {
+      console.error("Supabase init failed:", e);
+    }
+
+    // -------------------- I18N --------------------
+    const detectLang = () =>
+      (navigator.language || "en").toLowerCase().startsWith("ar") ? "ar" : "en";
+    const currentLang = detectLang();
+    const T = {
+      en: {
+        dir: "ltr", title: "RITES OF THE DUAT", subtitle: "Three trials. One eternal imprint.",
+        email: "Email", password: "Password", displayName: "Scribe Name",
+        signIn: "ENTER", signUp: "INSCRIBE",
+        choosePatron: "CHOOSE YOUR ANCIENT FORCE",
+        credits: "CREDITS", imprints: "IMPRINTS", torch: "RA'S TORCH", days: "days",
+        factionTitle: "SCROLL OF DESTINY", stabilityFee: "STABILITY FEE",
+        safeMode: "SAFE MODE", highRisk: "HIGH RISK", beginTrials: "BEGIN THE TRIALS",
+        hint: "WHISPER OF THE TEMPLE",
+        submitQuestion: "SUBMIT TO SCRIBES", backHub: "HUB",
+        leaderboardTitle: "ETERNAL SCRIBES", you: "you",
+        consecrate: "CONSECRATE", curse: "OVERWRITE (60)",
+        perished: "The high priests assumed you perished...",
+        loading: "Awakening...", timeFuse: "FUSE OF FATE",
+        rateLimit: "Max 3 questions per day reached!",
+        sealedOfRa: "Seal of the Council approved!", rejected: "Rejected by the Council.",
+        back: "Back", submit: "Submit", signUpError: "Sign up failed. Try again.",
+        disclaimer: "This game draws from Ancient Egyptian heritage as historical legacy. Truth belongs to the One."
+      },
+      ar: {
+        dir: "rtl", title: "طقوس العالم السفلي", subtitle: "ثلاث محن. بصمة أبدية.",
+        email: "البريد", password: "كلمة السر", displayName: "اسم الكاتب",
+        signIn: "دخول", signUp: "نقش",
+        choosePatron: "اختر قوتك القديمة",
+        credits: "ائتمانات", imprints: "بصمات", torch: "شُعلة رع", days: "أيام",
+        factionTitle: "لفافة المصير", stabilityFee: "رسوم الاستقرار",
+        safeMode: "نمط الأمان", highRisk: "خطر عالٍ", beginTrials: "ابدأ المحن",
+        hint: "همسة المعبد",
+        submitQuestion: "قدّم للكتبة", backHub: "القاعة",
+        leaderboardTitle: "الكتبة الأبديون", you: "أنت",
+        consecrate: "كرّس", curse: "استبدال (60)",
+        perished: "ظن الكهنة أنك هلكت...",
+        loading: "...الاستيقاظ", timeFuse: "فتيل المصير",
+        rateLimit: "تم بلوغ الحد الأقصى (3 أسئلة يومياً)!",
+        sealedOfRa: "ختم المجلس!", rejected: "رفضه المجلس.",
+        back: "رجوع", submit: "إرسال", signUpError: "فشل التسجيل. حاول مجدداً.",
+        disclaimer: "هذه اللعبة تستلهم رموز الحضارة المصرية القديمة كتراث تاريخي، ولا تعبّد أي كائن. الحقيقة لله وحده."
+      }
+    };
+    const t = T[currentLang];
+    document.documentElement.dir = t.dir;
+
+    // -------------------- SEED QUESTIONS --------------------
+    const generateSeedQuestions = () => {
+      const base = [
+        { id:"seed1",  text_en:"Which ancient Egyptian symbol represents life?", text_ar:"أي رمز مصري قديم يمثل الحياة؟", options_en:["Ankh","Scarab","Eye of Horus","Pyramid"], options_ar:["عنخ","جعران","عين حورس","هرم"], correct:0, category:"egyptian", hint_en:"Cross with loop", hint_ar:"صليب بيد", is_active:true, submitted_by:"system" },
+        { id:"seed2",  text_en:"What is the underworld realm in Egyptian mythology called?", text_ar:"ما اسم العالم السفلي في الأساطير المصرية؟", options_en:["Aaru","Duat","Amenti","Khepri"], options_ar:["آرو","دوات","أمنتي","خبري"], correct:1, category:"egyptian", hint_en:"Where the sun travels at night", hint_ar:"حيث يسافر الشمس ليلاً", is_active:true, submitted_by:"system" },
+        { id:"seed3",  text_en:"Which pharaoh's tomb was found intact in 1922?", text_ar:"مقبرة أي فرعون وُجدت سليمة 1922؟", options_en:["Ramses II","Tutankhamun","Akhenaten","Khufu"], options_ar:["رمسيس الثاني","توت عنخ آمون","إخناتون","خوفو"], correct:1, category:"egyptian", hint_en:"Boy king", hint_ar:"الملك الطفل", is_active:true, submitted_by:"system" },
+        { id:"seed4",  text_en:"What does the Eye of Horus represent?", text_ar:"ماذا تمثل عين حورس؟", options_en:["War","Protection & health","Famine","Astronomy"], options_ar:["حرب","حماية وصحة","مجاعة","فلك"], correct:1, category:"egyptian", hint_en:"Amulet", hint_ar:"تميمة", is_active:true, submitted_by:"system" },
+        { id:"seed5",  text_en:"Which beetle symbolized rebirth in ancient Egypt?", text_ar:"أي خنفساء كانت ترمز للبعث في مصر القديمة؟", options_en:["Stag","Dung (Scarab)","Goliath","Click"], options_ar:["الأيل","الجعران","جولياث","نقر"], correct:1, category:"egyptian", hint_en:"Rolls the sun", hint_ar:"يدحرج الشمس", is_active:true, submitted_by:"system" },
+        { id:"seed6",  text_en:"Who was the Greek philosopher who taught Alexander the Great?", text_ar:"من هو الفيلسوف الإغريقي الذي علّم الإسكندر الأكبر؟", options_en:["Socrates","Plato","Aristotle","Pythagoras"], options_ar:["سقراط","أفلاطون","أرسطو","فيثاغورس"], correct:2, category:"greek", hint_en:"Lyceum", hint_ar:"الليسيوم", is_active:true, submitted_by:"system" },
+        { id:"seed7",  text_en:"Which dynasty started the Great Wall of China?", text_ar:"أي سلالة بدأت بناء سور الصين العظيم؟", options_en:["Han","Qin","Tang","Ming"], options_ar:["هان","تشين","تانغ","مينغ"], correct:1, category:"chinese", hint_en:"First emperor", hint_ar:"الإمبراطور الأول", is_active:true, submitted_by:"system" },
+        { id:"seed8",  text_en:"Capital of Norway?", text_ar:"عاصمة النرويج؟", options_en:["Stockholm","Oslo","Copenhagen","Helsinki"], options_ar:["ستوكهولم","أوسلو","كوبنهاغن","هلسنكي"], correct:1, category:"geography", hint_en:"Fjords", hint_ar:"المضايق", is_active:true, submitted_by:"system" },
+        { id:"seed9",  text_en:"Who painted the Mona Lisa?", text_ar:"من رسم الموناليزا؟", options_en:["Van Gogh","Picasso","Da Vinci","Rembrandt"], options_ar:["فان جوخ","بيكاسو","دا فينشي","رامبرانت"], correct:2, category:"art", hint_en:"Italian Renaissance", hint_ar:"عصر النهضة الإيطالي", is_active:true, submitted_by:"system" },
+        { id:"seed10", text_en:"What is the largest desert on Earth?", text_ar:"ما أكبر صحراء على الأرض؟", options_en:["Sahara","Gobi","Antarctic","Arabian"], options_ar:["الصحراء الكبرى","غوبي","القطب الجنوبي","العربية"], correct:2, category:"geography", hint_en:"Ice, not sand", hint_ar:"جليد، ليس رمالاً", is_active:true, submitted_by:"system" },
+        { id:"seed11", text_en:"Norse mythology: What is the name of Thor's hammer?", text_ar:"في الأساطير الإسكندنافية: ما اسم مطرقة ثور؟", options_en:["Gungnir","Mjolnir","Gleipnir","Gram"], options_ar:["غونغنير","ميولنير","غليبنير","غرام"], correct:1, category:"norse", hint_en:"Lightning weapon", hint_ar:"سلاح البرق", is_active:true, submitted_by:"system" },
+        { id:"seed12", text_en:"Which ancient civilization built Machu Picchu?", text_ar:"أي حضارة قديمة بنت ماتشو بيتشو؟", options_en:["Aztec","Maya","Inca","Olmec"], options_ar:["أزتيك","مايا","إنكا","أولميك"], correct:2, category:"aztec", hint_en:"High in the Andes", hint_ar:"مرتفع في الأنديز", is_active:true, submitted_by:"system" },
+        { id:"seed13", text_en:"Which ancient wonder was located at Alexandria?", text_ar:"أي عجائب الدنيا السبع كانت في الإسكندرية؟", options_en:["Pyramids","Lighthouse","Hanging Gardens","Colossus"], options_ar:["الأهرامات","المنارة","الحدائق المعلقة","التمثال"], correct:1, category:"egyptian", hint_en:"Guided ships", hint_ar:"وجه السفن", is_active:true, submitted_by:"system" },
+        { id:"seed14", text_en:"What is the hardest natural substance on Earth?", text_ar:"ما هي أقسى مادة طبيعية على وجه الأرض؟", options_en:["Gold","Iron","Diamond","Quartz"], options_ar:["الذهب","الحديد","الألماس","الكوارتز"], correct:2, category:"science", hint_en:"Carbon structure", hint_ar:"بنية كربونية", is_active:true, submitted_by:"system" },
+        { id:"seed15", text_en:"Which planet is known as the Red Planet?", text_ar:"أي كوكب يعرف بالكوكب الأحمر؟", options_en:["Venus","Mars","Jupiter","Saturn"], options_ar:["الزهرة","المريخ","المشتري","زحل"], correct:1, category:"science", hint_en:"Iron oxide surface", hint_ar:"سطح غني بأكسيد الحديد", is_active:true, submitted_by:"system" },
+        { id:"seed16", text_en:"What is the capital city of Japan?", text_ar:"ما هي عاصمة اليابان؟", options_en:["Kyoto","Osaka","Hiroshima","Tokyo"], options_ar:["كيوتو","أوساكا","هيروشيما","طوكيو"], correct:3, category:"geography", hint_en:"Metropolis", hint_ar:"مدينة ضخمة صاخبة", is_active:true, submitted_by:"system" },
+        { id:"seed17", text_en:"How many elements are in the periodic table?", text_ar:"كم عدداً للعناصر في الجدول الدوري؟", options_en:["92","105","118","120"], options_ar:["92","105","118","120"], correct:2, category:"science", hint_en:"Ends with Oganesson", hint_ar:"ينتهي بعنصر الأوجانيسون", is_active:true, submitted_by:"system" },
+        { id:"seed18", text_en:"Who discovered penicillin?", text_ar:"من هو مكتشف البنسلين؟", options_en:["Louis Pasteur","Alexander Fleming","Marie Curie","Gregor Mendel"], options_ar:["لويس باستور","ألكسندر فلمنج","ماري كوري","غريغور مندل"], correct:1, category:"science", hint_en:"Accidental mold discovery", hint_ar:"اكتشاف بالصدفة من العفن", is_active:true, submitted_by:"system" },
+        { id:"seed19", text_en:"Which ocean is the largest on Earth?", text_ar:"أي محيط هو الأكبر على الأرض؟", options_en:["Atlantic","Indian","Arctic","Pacific"], options_ar:["الأطلسي","الهندي","المتجمد الشمالي","الهادئ"], correct:3, category:"geography", hint_en:"Covers a third of Earth", hint_ar:"يغطي ثلث مساحة الأرض", is_active:true, submitted_by:"system" },
+        { id:"seed20", text_en:"In which year did the Titanic sink?", text_ar:"في أي عام غرقت سفينة تايتانيك؟", options_en:["1905","1912","1920","1925"], options_ar:["1905","1912","1920","1925"], correct:1, category:"history", hint_en:"Before World War I", hint_ar:"قبل الحرب العالمية الأولى", is_active:true, submitted_by:"system" },
+        { id:"seed21", text_en:"What is the primary language spoken in Brazil?", text_ar:"ما هي اللغة الرسمية والأساسية في البرازيل؟", options_en:["Spanish","Portuguese","French","English"], options_ar:["الإسبانية","البرتغالية","الفرنسية","الإنجليزية"], correct:1, category:"general", hint_en:"Due to historical colonization", hint_ar:"بسبب الاستعمار التاريخي", is_active:true, submitted_by:"system" },
+        { id:"seed22", text_en:"What gas do plants absorb during photosynthesis?", text_ar:"ما هو الغاز الذي تمتصه النباتات أثناء البناء الضوئي؟", options_en:["Oxygen","Nitrogen","Carbon Dioxide","Hydrogen"], options_ar:["الأكسجين","النيتروجين","ثاني أكسيد الكربون","الهيدروجين"], correct:2, category:"science", hint_en:"Emitted by humans", hint_ar:"ينتجه البشر في الزفير", is_active:true, submitted_by:"system" },
+        { id:"seed23", text_en:"Which is the smallest country in the world?", text_ar:"ما هي أصغر دولة في العالم؟", options_en:["Monaco","Malta","San Marino","Vatican City"], options_ar:["موناكو","مالطا","سان مارينو","الفاتيكان"], correct:3, category:"geography", hint_en:"Religious city-state", hint_ar:"مدينة دينية", is_active:true, submitted_by:"system" },
+        { id:"seed24", text_en:"Who wrote the play 'Romeo and Juliet'?", text_ar:"من هو كاتب مسرحية 'روميو وجولييت'؟", options_en:["Charles Dickens","William Shakespeare","Mark Twain","Leo Tolstoy"], options_ar:["تشارلز ديكنز","ويليام شكسبير","مارك توين","ليو تولستوي"], correct:1, category:"art", hint_en:"English playwright", hint_ar:"شاعر ومسرحي إنجليزي شهير", is_active:true, submitted_by:"system" },
+        { id:"seed25", text_en:"What is the currency of the United Kingdom?", text_ar:"ما هي العملة الرسمية للمملكة المتحدة؟", options_en:["Euro","Dollar","Pound Sterling","Franc"], options_ar:["اليورو","الدولار","الجنيه الإسترليني","الفرنك"], correct:2, category:"general", hint_en:"British Currency", hint_ar:"الباوند الشهير", is_active:true, submitted_by:"system" },
+        { id:"seed26", text_en:"Which blood type is considered the universal donor?", text_ar:"أي فصيلة دم تعتبر مانحاً عاماً لجميع الفصائل؟", options_en:["A+","B-","AB+","O-"], options_ar:["A+","B-","AB+","O-"], correct:3, category:"science", hint_en:"Has no antigens", hint_ar:"لا تحتوي على مولدات ضد", is_active:true, submitted_by:"system" },
+        { id:"seed27", text_en:"What is the tallest mountain on Earth?", text_ar:"ما هو أعلى جبل على سطح الأرض؟", options_en:["K2","Kilimanjaro","Mount Everest","Fuji"], options_ar:["K2","كيليمانجارو","جبل إيفرست","فوجي"], correct:2, category:"geography", hint_en:"Located in the Himalayas", hint_ar:"يقع في سلاسل جبال الهيمالايا", is_active:true, submitted_by:"system" },
+        { id:"seed28", text_en:"Which is the main asset of the Polygon network?", text_ar:"ما هي العملة الأساسية لشبكة بوليجون؟", options_en:["ETH","POL / MATIC","BNB","SOL"], options_ar:["ETH","POL / MATIC","BNB","SOL"], correct:1, category:"blockchain", hint_en:"Scaling token", hint_ar:"توكن توسع الإيثيريوم", is_active:true, submitted_by:"system" },
+        { id:"seed29", text_en:"What is the chemical symbol for Gold?", text_ar:"ما هو الرمز الكيميائي لعنصر الذهب؟", options_en:["Ag","Fe","Au","Pb"], options_ar:["Ag","Fe","Au","Pb"], correct:2, category:"science", hint_en:"From Latin Aurum", hint_ar:"مشتق من الكلمة اللاتينية Aurum", is_active:true, submitted_by:"system" },
+        { id:"seed30", text_en:"How many bones are in an adult human body?", text_ar:"كم عدد العظام في جسم الإنسان البالغ؟", options_en:["150","206","300","360"], options_ar:["150","206","300","360"], correct:1, category:"science", hint_en:"Fewer than a newborn", hint_ar:"أقل من عددها عند الطفل المولود", is_active:true, submitted_by:"system" }
+      ];
+      for (let i = 31; i <= 50; i++) {
+        base.push({ id:`seed${i}`, text_en:`Technical Trial ${i}: What mechanism prevents inflation in fixed-supply tokens?`, text_ar:`المحنة التقنية ${i}: ما هي الآلية الأساسية لمنع التضخم في العملات الرقمية؟`, options_en:["Infinite minting","Burn Mechanism","No rules","High inflation"], options_ar:["السك اللانهائي","آلية الحرق (Burn)","إلغاء القوانين","التضخم المرتفع"], correct:1, category:"blockchain", hint_en:"Reduces circulating coins", hint_ar:"يقلل عدد العملات المتاحة بالتداول", is_active:true, submitted_by:"system" });
+      }
+      return base;
+    };
+    const FULL_SEED = generateSeedQuestions();
+
+    // -------------------- HOOKS --------------------
+    const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+    // -------------------- ICONS --------------------
+    const FlameIcon = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M12 2c-2 4-4 6-4 9a4 4 0 0 0 8 0c0-3-2-5-4-9z" />
+        <path d="M12 22c-3 0-5-2-5-4 0-2 2-3 5-3s5 1 5 3-2 4-5 4z" />
+      </svg>
+    );
+
+    // -------------------- AUTH SCREEN (FIXED: email capitalisation) --------------------
+    const AuthScreen = ({ onSignIn, onSignUp }) => {
+      const [email, setEmail]     = useState("");
+      const [pass,  setPass]      = useState("");
+      const [name,  setName]      = useState("");
+      const [isSignUp, setIsSignUp] = useState(false);
+      const [errorMsg, setErrorMsg] = useState("");
+      const [busy, setBusy]       = useState(false);
+
+      const handleSubmit = async () => {
+        setErrorMsg(""); setBusy(true);
+        try {
+          if (isSignUp) {
+            const { error } = await onSignUp(email, pass, name);
+            if (error) setErrorMsg(error.message || t.signUpError);
+            else alert("Check your email to verify your account.");
+          } else {
+            const { error } = await onSignIn(email, pass);
+            if (error) setErrorMsg(error.message);
+          }
+        } finally { setBusy(false); }
+      };
+
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-black bg-cover bg-center relative px-4"
+             style={{ backgroundImage:"url('https://images.unsplash.com/photo-1600577916048-804c9191e36c?q=80&w=1000')" }}>
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+          <div className="bg-gradient-to-b from-amber-950/40 to-stone-900/80 backdrop-blur-md p-8 rounded-2xl border border-amber-600 w-full max-w-sm text-center relative z-10 shadow-2xl shadow-amber-900/50 fade-in">
+            <div className="w-24 h-24 mx-auto mb-4 bg-contain bg-center bg-no-repeat rounded-full border-2 border-amber-500 shadow-lg shadow-amber-500/20"
+                 style={{ backgroundImage:"url('https://i.ibb.co/6RbyVfL5/1000096919.jpg')" }} />
+            <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-600 tracking-wider mb-1">{t.title}</h2>
+            <p className="text-xs text-amber-500/80 tracking-widest mb-4 font-medium">{t.subtitle}</p>
+            <input className="w-full mt-4 p-2 bg-black/70 border border-amber-700/60 rounded text-amber-100 placeholder-amber-700/70 focus:outline-none focus:border-amber-400"
+                   type="email" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck="false"
+                   placeholder={t.email} value={email} onChange={e => setEmail(e.target.value)} />
+            <input className="w-full mt-2 p-2 bg-black/70 border border-amber-700/60 rounded text-amber-100 placeholder-amber-700/70 focus:outline-none focus:border-amber-400"
+                   type="password" autoCapitalize="none" autoCorrect="off"
+                   placeholder={t.password} value={pass} onChange={e => setPass(e.target.value)} />
+            {isSignUp && (
+              <input className="w-full mt-2 p-2 bg-black/70 border border-amber-700/60 rounded text-amber-100 placeholder-amber-700/70 focus:outline-none focus:border-amber-400"
+                     autoCapitalize="words" autoCorrect="off" spellCheck="false"
+                     placeholder={t.displayName} value={name} onChange={e => setName(e.target.value)} />
+            )}
+            {errorMsg && <p className="text-red-400 text-sm mt-2">{errorMsg}</p>}
+            <button onClick={handleSubmit} disabled={busy}
+                    className="mt-6 w-full bg-gradient-to-r from-amber-800 to-amber-600 hover:from-amber-700 hover:to-amber-500 disabled:opacity-50 py-2.5 rounded font-bold text-black tracking-widest shadow-md transition-all duration-300">
+              {busy ? "..." : (isSignUp ? t.signUp : t.signIn)}
+            </button>
+            <p className="mt-4 text-sm cursor-pointer text-amber-400/80 hover:text-amber-300 transition-colors"
+               onClick={() => { setIsSignUp(!isSignUp); setErrorMsg(""); }}>
+              {isSignUp ? t.back : t.signUp}
+            </p>
+          </div>
+        </div>
+      );
+    };
+
+    // -------------------- ONBOARDING --------------------
+    const OnboardingScreen = ({ onSelectForce }) => {
+      const forces = [
+        { id:"ra",     name:"Solar Radiance",   ability_en:"+3 seconds to timer",                  ability_ar:"+3 ثوانٍ للمؤقت",            icon:"☀️", bgImg:"https://i.ibb.co/3ykZpndd/1000097566.png", desc_en:"Blessing of the Sun",  desc_ar:"بركة الشمس" },
+        { id:"anubis", name:"Scales of Truth",  ability_en:"Hide 2 wrong options once per round",  ability_ar:"إخفاء خيارين خاطئين",        icon:"⚰️", bgImg:"https://i.ibb.co/NdmS0MhF/1000097154.png", desc_en:"Weigher of Hearts",    desc_ar:"ميزان القلوب" },
+        { id:"isis",   name:"Shield of Wisdom", ability_en:"Revival shield for first wrong answer", ability_ar:"درع إحياء",                  icon:"🪶", bgImg:"https://i.ibb.co/8DwV0Xf0/1000097567.png", desc_en:"Protector",            desc_ar:"الحامية" },
+        { id:"horus",  name:"Eye of Vigilance", ability_en:"Double credits on final correct",      ability_ar:"ضعف النقاط في السؤال الأخير", icon:"🦅", bgImg:"https://i.ibb.co/VWTgSgLz/1000097151.png", desc_en:"Watchful",             desc_ar:"الساهر" }
+      ];
+      return (
+        <div className="min-h-screen py-12 px-4 bg-gradient-to-b from-neutral-950 via-stone-900 to-black flex flex-col justify-center items-center fade-in">
+          <h2 className="text-center text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 tracking-wider mb-2">{t.choosePatron}</h2>
+          <div className="w-16 h-0.5 bg-amber-600 mb-12" />
+          <div className="flex flex-wrap justify-center gap-6 max-w-5xl">
+            {forces.map(f => (
+              <div key={f.id} onClick={() => onSelectForce(f.id)}
+                   className="group cursor-pointer w-60 h-80 rounded-xl overflow-hidden relative border border-amber-700/50 hover:border-amber-400 bg-black shadow-xl transition-all duration-500 hover:-translate-y-2 flex flex-col justify-end p-4">
+                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-60"
+                     style={{ backgroundImage:`url('${f.bgImg}')` }} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <div className="relative z-10 text-center">
+                  <div className="text-4xl mb-2 filter drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]">{f.icon}</div>
+                  <div className="text-xl font-bold text-amber-200">{f.name}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-amber-500 mt-0.5">{currentLang==='en' ? f.desc_en : f.desc_ar}</div>
+                  <div className="text-xs text-stone-300 mt-3 bg-black/80 backdrop-blur-sm p-2 rounded border border-amber-900/60 font-medium">
+                    {currentLang==='en' ? f.ability_en : f.ability_ar}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // -------------------- HUB SCREEN (Fixed flame logic based on real last_login) --------------------
+    const HubScreen = ({ profile, credits, streak, imprints, factionWar, leaderboard, onStartRound, onSignOut, onViewSubmit, onViewScroll, simulateAbsence, setSimulateAbsence }) => {
+      // flameActive: uses real profile.last_login unless simulateAbsence is true (for testing)
+      const flameActive = (() => {
+        if (simulateAbsence) return false;
+        if (!profile?.last_login) return true;
+        const diff = Math.floor((new Date() - new Date(profile.last_login)) / (1000*3600*24));
+        return diff <= 1;
+      })();
+      const total = factionWar.ra + factionWar.anubis + 1;
+      const raPct = (factionWar.ra / total) * 100;
+
+      return (
+        <div className={`min-h-screen p-4 md:p-8 relative ${simulateAbsence ? 'cobweb-overlay' : ''} bg-cover bg-center fade-in`}
+             style={{ backgroundImage:"url('https://i.ibb.co/VWTgSgLz/1000097151.png')" }}>
+          <div className="absolute inset-0 bg-neutral-950/90 backdrop-blur-[2px]" />
+          <div className="max-w-6xl mx-auto relative z-10">
+            <div className="flex flex-wrap gap-3 justify-between items-center border-b border-amber-800/60 pb-4">
+              <div className="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-cover bg-center border border-amber-500"
+                     style={{ backgroundImage:"url('https://i.ibb.co/6RbyVfL5/1000096919.jpg')" }} />
+                𓃀 {profile.display_name}
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setSimulateAbsence(!simulateAbsence)}
+                        className="text-[10px] tracking-wider uppercase border border-stone-700 hover:border-amber-600 text-stone-400 hover:text-amber-400 px-3 py-1.5 rounded bg-black/40 transition-all">
+                  🐪 Simulate 7d absence
+                </button>
+                <button onClick={onSignOut} className="text-stone-400 hover:text-red-400 transition-colors text-xl">🚪</button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <div className="bg-gradient-to-b from-stone-900/90 to-black/90 p-5 rounded-xl border border-amber-900/60 shadow-xl backdrop-blur-sm">
+                <div className="flex justify-between items-center border-b border-stone-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <FlameIcon className={flameActive ? 'flame-animate text-orange-500' : 'text-gray-500'} />
+                    <span className="text-sm font-bold tracking-wider">{t.torch}</span>
+                  </div>
+                  <strong className="text-amber-400 text-lg">{streak} {t.days}</strong>
+                </div>
+                {(!flameActive) && (
+                  <p className="text-red-400/90 text-xs mt-2 bg-red-950/30 p-2 rounded border border-red-900/40 italic">{t.perished}</p>
+                )}
+                <div className="mt-4 flex justify-between items-center text-sm">
+                  <span className="text-stone-400">{t.credits}:</span>
+                  <span className="font-bold text-yellow-500 text-base">✨ {credits}</span>
+                </div>
+                <div className="mt-1 flex justify-between items-center text-sm">
+                  <span className="text-stone-400">{t.imprints}:</span>
+                  <span className="font-bold text-amber-400 text-base">𓋹 {imprints.length}</span>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-b from-stone-900/90 to-black/90 p-5 rounded-xl border border-amber-900/60 shadow-xl backdrop-blur-sm">
+                <div className="text-sm font-bold tracking-wider text-amber-200 border-b border-stone-800 pb-3 uppercase">{t.factionTitle}</div>
+                <div className="w-full bg-stone-950 h-3 border border-amber-900/30 rounded-full mt-4 overflow-hidden">
+                  <div className="bg-gradient-to-r from-amber-600 to-yellow-500 h-full" style={{ width:`${raPct}%` }} />
+                </div>
+                <div className="flex justify-between text-[10px] tracking-wider font-bold mt-2 text-stone-400">
+                  <span>Solar Radiance</span><span>Scales of Truth</span>
+                </div>
+                <div className="mt-4 pt-2 border-t border-stone-800/60 flex justify-between text-xs text-stone-400">
+                  <span>{t.stabilityFee}: <span className="text-amber-500 font-bold">{factionWar.stabilityFee}%</span></span>
+                  <span className="uppercase tracking-widest font-bold text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/30">
+                    {factionWar.mode === 'safe' ? t.safeMode : t.highRisk}
+                  </span>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-b from-stone-900/60 to-black/80 p-5 rounded-xl border border-amber-800/40 flex flex-col justify-center gap-3">
+                <button onClick={onStartRound}
+                        className="w-full bg-gradient-to-r from-amber-700 to-amber-500 hover:from-amber-600 hover:to-amber-400 py-3 rounded-xl font-black text-black tracking-widest text-lg shadow-lg shadow-amber-950 transition-all duration-300">
+                  {t.beginTrials}
+                </button>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <button onClick={onViewSubmit}
+                          className="border border-amber-700/60 hover:border-amber-400 text-amber-400/90 hover:text-amber-200 py-2 rounded text-xs tracking-wider transition-colors bg-black/30 font-medium">
+                    {t.submitQuestion}
+                  </button>
+                  <button onClick={onViewScroll}
+                          className="border border-amber-700/60 hover:border-amber-400 text-amber-400/90 hover:text-amber-200 py-2 rounded text-xs tracking-wider transition-colors bg-black/30 font-medium">
+                    {t.leaderboardTitle}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 bg-black/40 border border-stone-900 rounded-xl p-5 shadow-2xl">
+              <h3 className="text-amber-400 font-bold tracking-wider border-b border-stone-800 pb-2 mb-4 uppercase flex items-center gap-2">
+                <span>🏆</span> {t.leaderboardTitle}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                {leaderboard.map((p, i) => (
+                  <div key={i}
+                       className={`flex justify-between items-center border-b border-stone-900 py-2 text-sm ${p.display_name===profile.display_name ? 'bg-amber-950/20 px-2 rounded border border-amber-900/30 text-amber-300 font-bold' : ''}`}>
+                    <span className="flex items-center gap-2 text-stone-300">
+                      <span className="text-xs text-stone-500 font-mono w-4">{i+1}.</span> {p.display_name}
+                      {p.display_name===profile.display_name && (
+                        <span className="text-[10px] tracking-widest uppercase bg-amber-700 text-black px-1 rounded font-black">{t.you}</span>
+                      )}
+                    </span>
+                    <span className="font-mono font-bold text-amber-400">{p.total_score}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-12 text-center text-[11px] text-stone-600 border-t border-stone-900 pt-6 leading-relaxed font-medium tracking-wide max-w-2xl mx-auto">
+              {t.disclaimer}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // -------------------- PLAY SCREEN (FIXED: no negative credits) --------------------
+    const PlayScreen = ({ round, roundIndex, setRoundIndex, selectedForce, credits, setCredits, profile, updateProfile, onFinish, consecrate, triggerOverwrite, stabilityFeePercent }) => {
+      const q = round[roundIndex];
+      const startTime = selectedForce === 'ra' ? 18 : 15;
+      const [timeLeft, setTimeLeft] = useState(startTime);
+      const [answered, setAnswered] = useState(false);
+      const [shake, setShake]       = useState(false);
+      const [usedAnubis, setUsedAnubis] = useState(false);
+      const [hiddenWrong, setHiddenWrong] = useState(false);
+      const [qOwner, setQOwner]     = useState(null);
+      const timerRef = useRef(null);
+
+      // Reset when question changes
+      useEffect(() => {
+        setTimeLeft(startTime);
+        setAnswered(false);
+        setHiddenWrong(false);
+        setQOwner(null);
+        setShake(false);
+      }, [roundIndex]);
+
+      // Fetch owner
+      useEffect(() => {
+        if (!q?.id || !supabase) return;
+        supabase.from('imprints').select('player_name').eq('question_id', q.id).maybeSingle()
+          .then(({ data }) => { if (data) setQOwner(data.player_name); });
+      }, [q?.id]);
+
+      // Timer
+      useEffect(() => {
+        if (answered) return;
+        clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+          setTimeLeft(prev => {
+            if (prev <= 1) {
+              clearInterval(timerRef.current);
+              return 0;
+            }
+            if (prev <= 5) setShake(true);
+            return prev - 1;
+          });
+        }, 1000);
+        return () => clearInterval(timerRef.current);
+      }, [answered, roundIndex]);
+
+      // Timeout trigger
+      useEffect(() => {
+        if (timeLeft === 0 && !answered) handleAnswer(-1);
+      }, [timeLeft]);
+
+      const handleAnswer = useCallback((chosenIdx) => {
+        if (answered) return;
+        setAnswered(true);
+        clearInterval(timerRef.current);
+        setShake(false);
+
+        const isRight = chosenIdx === q.correct;
+        let reward = isRight ? 10 : -5;
+        let speedBonus = isRight && timeLeft >= 12 ? 20 : 0;
+        let totalDelta = reward + speedBonus;
+        if (stabilityFeePercent > 5 && isRight) totalDelta = Math.floor(totalDelta * 1.2);
+        let newCredits = credits + totalDelta;
+        // FIX: prevent negative credits
+        if (newCredits < 0) newCredits = 0;
+        const newScore   = (profile.total_score || 0) + (isRight ? 10 : 0);
+        updateProfile({ credits: newCredits, total_score: newScore });
+        setCredits(newCredits);
+
+        setTimeout(() => {
+          if (isRight) {
+            if (qOwner) {
+              if (qOwner !== profile.display_name && newCredits >= 60) {
+                if (window.confirm(`${t.curse} occupied by ${qOwner}?`)) triggerOverwrite(q.id, qOwner);
+              }
+            } else {
+              const cost = stabilityFeePercent > 5 ? 40 : 30;
+              if (newCredits >= cost && window.confirm(`${t.consecrate} (${cost} credits)?`)) consecrate(q.id, cost);
+            }
+          }
+          if (roundIndex + 1 < round.length) setRoundIndex(prev => prev + 1);
+          else onFinish();
+        }, 1200);
+      }, [answered, q, credits, timeLeft, qOwner, roundIndex, round.length]);
+
+      const isHintLie = useMemo(() => Math.random() < 0.3, [q?.id]);
+      const hintText  = q ? (q[`hint_${currentLang}`] || q.hint_en) : "";
+      const displayHint = isHintLie ? (currentLang==='en' ? "Deception: maybe false" : "خداع: ربما كاذب") : hintText;
+      const forceIcons  = { ra:"☀️ Solar Radiance", anubis:"⚰️ Scales of Truth", isis:"🪶 Shield of Wisdom", horus:"🦅 Eye of Vigilance" };
+
+      if (!q) return null;
+      const options = currentLang === 'en' ? q.options_en : q.options_ar;
+
+      return (
+        <div className={`min-h-screen p-4 flex items-center justify-center bg-cover bg-center relative ${shake ? 'shake' : ''}`}
+             style={{ backgroundImage:"url('https://i.ibb.co/6Wv6XvYV/1000097152.png')" }}>
+          <div className="absolute inset-0 bg-neutral-950/85" />
+          <div className="max-w-2xl w-full bg-stone-900/90 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-amber-700/60 shadow-2xl relative z-10 fade-in">
+            <div className="flex justify-between items-center text-[10px] tracking-widest font-bold text-stone-400 uppercase mb-2">
+              <span className="text-amber-500">🛡️ {forceIcons[selectedForce] || "Ancient Force"}</span>
+              {qOwner && <span className="text-red-400 bg-red-950/40 px-2 py-0.5 rounded border border-red-900/30">📜 Owner: {qOwner}</span>}
+            </div>
+            <div className="flex justify-between items-center text-xs tracking-widest font-bold text-stone-400 uppercase">
+              <span>🔥 {t.timeFuse}</span>
+              <span className={timeLeft <= 4 ? 'text-red-500 flame-animate' : ''}>{timeLeft}s</span>
+            </div>
+            <div className="w-full h-2 bg-stone-950 border border-stone-800/80 rounded-full mt-2 overflow-hidden shadow-inner">
+              <div className="h-full bg-gradient-to-r from-amber-600 to-yellow-400 transition-all duration-1000 rounded-full"
+                   style={{ width:`${(timeLeft/startTime)*100}%` }} />
+            </div>
+            <div className="text-xl md:text-2xl my-8 font-bold leading-relaxed text-amber-100 border-l-2 md:border-l-4 border-amber-500 pl-4">
+              {currentLang==='en' ? q.text_en : q.text_ar}
+            </div>
+            <div className="grid grid-cols-1 gap-3 mt-6">
+              {options
+                .map((opt, idx) => ({opt, idx}))
+                .filter(({idx}) => !(selectedForce==='anubis' && hiddenWrong && idx !== q.correct))
+                .map(({opt, idx}) => (
+                  <button key={idx} onClick={() => handleAnswer(idx)} disabled={answered}
+                          className="bg-black/40 border border-stone-800/70 p-3.5 rounded-xl hover:bg-amber-950/40 hover:border-amber-600 disabled:opacity-60 text-left text-sm font-medium tracking-wide text-stone-300 hover:text-amber-200 transition-all duration-200">
+                    {opt}
+                  </button>
+                ))
+              }
+            </div>
+            {selectedForce==='anubis' && !usedAnubis && !hiddenWrong && (
+              <button onClick={() => { setHiddenWrong(true); setUsedAnubis(true); }}
+                      className="mt-4 text-xs tracking-wider uppercase font-bold text-amber-400 bg-amber-950/60 border border-amber-800/50 hover:border-amber-500 px-3 py-2 rounded-xl transition-colors">
+                🔮 Hide 2 wrong (Scales of Truth)
+              </button>
+            )}
+            <div className="mt-6 p-3 bg-black/60 rounded-xl italic border-l-4 border-amber-600 text-xs md:text-sm tracking-wide text-stone-400">
+              <span className="text-amber-500 not-italic font-black uppercase mr-1">𓋹 {t.hint}:</span> {displayHint}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // -------------------- SUBMIT SCREEN (unchanged) --------------------
+    const SubmitScreen = ({ onSubmit, onBack }) => {
+      const [newQ, setNewQ] = useState({ text_en:"", text_ar:"", opt1_en:"", opt2_en:"", opt3_en:"", opt4_en:"", opt1_ar:"", opt2_ar:"", opt3_ar:"", opt4_ar:"", correct:0, hint_en:"", hint_ar:"" });
+      const handleSend = () => onSubmit({
+        id:`user_${Date.now()}`, text_en:newQ.text_en, text_ar:newQ.text_ar,
+        options_en:[newQ.opt1_en,newQ.opt2_en,newQ.opt3_en,newQ.opt4_en],
+        options_ar:[newQ.opt1_ar,newQ.opt2_ar,newQ.opt3_ar,newQ.opt4_ar],
+        correct:parseInt(newQ.correct)||0, hint_en:newQ.hint_en, hint_ar:newQ.hint_ar, category:"user", is_active:false
+      });
+      return (
+        <div className="min-h-screen p-4 flex items-center justify-center bg-cover bg-center relative"
+             style={{ backgroundImage:"url('https://i.ibb.co/VWTgSgLz/1000097151.png')" }}>
+          <div className="absolute inset-0 bg-neutral-950/90" />
+          <div className="max-w-2xl w-full bg-stone-900/90 backdrop-blur-md p-6 rounded-xl border border-amber-700/60 shadow-2xl relative z-10 fade-in">
+            <h2 className="text-2xl font-bold text-amber-400 tracking-wider mb-4 border-b border-stone-800 pb-2">{t.submitQuestion}</h2>
+            <textarea placeholder="English question"
+                      className="w-full p-2.5 bg-black/60 text-stone-200 rounded border border-stone-800 focus:outline-none focus:border-amber-600 text-sm my-2"
+                      onChange={e => setNewQ({...newQ, text_en:e.target.value})} />
+            <textarea placeholder="السؤال بالعربية"
+                      className="w-full p-2.5 bg-black/60 text-stone-200 rounded border border-stone-800 focus:outline-none focus:border-amber-600 text-sm my-2"
+                      onChange={e => setNewQ({...newQ, text_ar:e.target.value})} />
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {[1,2,3,4].map(n => (
+                <input key={`en${n}`} placeholder={`EN option ${n}`}
+                       className="p-2 bg-black/60 text-stone-200 rounded border border-stone-800 focus:outline-none focus:border-amber-600 text-sm"
+                       onChange={e => setNewQ({...newQ, [`opt${n}_en`]:e.target.value})} />
+              ))}
+              {[1,2,3,4].map(n => (
+                <input key={`ar${n}`} placeholder={`خيار ${n}`}
+                       className="p-2 bg-black/60 text-stone-200 rounded border border-stone-800 focus:outline-none focus:border-amber-600 text-sm"
+                       onChange={e => setNewQ({...newQ, [`opt${n}_ar`]:e.target.value})} />
+              ))}
+            </div>
+            <div className="mt-3 flex items-center gap-2 text-xs text-stone-400">
+              <span>Correct option (0-3):</span>
+              <input type="number" min="0" max="3" defaultValue="0"
+                     className="w-16 p-1 bg-black/60 text-stone-200 rounded border border-stone-800 focus:outline-none focus:border-amber-600 text-sm"
+                     onChange={e => setNewQ({...newQ, correct:e.target.value})} />
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button onClick={handleSend}
+                      className="bg-gradient-to-r from-amber-700 to-amber-500 text-black font-bold tracking-widest px-6 py-2 rounded-xl text-xs transition-transform active:scale-95">
+                {t.submit}
+              </button>
+              <button onClick={onBack}
+                      className="border border-stone-700 hover:border-stone-500 text-stone-400 px-4 py-2 rounded-xl text-xs transition-colors">
+                {t.backHub}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // -------------------- SCROLL SCREEN (unchanged) --------------------
+    const ScrollScreen = ({ leaderboard, onBack }) => (
+      <div className="min-h-screen p-4 flex items-center justify-center bg-cover bg-center relative"
+           style={{ backgroundImage:"url('https://i.ibb.co/VWTgSgLz/1000097151.png')" }}>
+        <div className="absolute inset-0 bg-neutral-950/90" />
+        <div className="bg-stone-900/90 max-w-xl w-full p-6 rounded-xl border border-amber-700/60 shadow-2xl relative z-10 fade-in">
+          <h2 className="text-2xl font-bold text-amber-400 tracking-wider border-b border-stone-800 pb-2 mb-4 uppercase">{t.leaderboardTitle}</h2>
+          <ul className="divide-y divide-stone-800/60">
+            {leaderboard.map((p, idx) => (
+              <li key={p.display_name+idx} className="py-2.5 flex justify-between items-center text-sm text-stone-300">
+                <span className="font-medium">
+                  <span className="text-xs text-stone-500 font-mono mr-2">{idx+1}.</span> {p.display_name}
+                </span>
+                <span className="font-mono font-bold text-amber-500">{p.total_score}</span>
+              </li>
+            ))}
+          </ul>
+          <button onClick={onBack}
+                  className="mt-6 border border-stone-700 hover:border-amber-600 text-stone-400 hover:text-amber-400 px-5 py-2 rounded-xl text-xs uppercase tracking-wider font-bold transition-all bg-black/20">
+            {t.backHub}
+          </button>
+        </div>
+      </div>
+    );
+
+    // -------------------- MAIN APP (FIXED: streak & last_login management, safe loadQuestions) --------------------
+    const App = () => {
+      const [session,       setSession]       = useState(null);
+      const [profile,       setProfile]       = useState(null);
+      const [loading,       setLoading]       = useState(true);
+      const [view,          setView]          = useState('auth');
+      const [selectedForce, setSelectedForce] = useState(null);
+      const [questionsDB,   setQuestionsDB]   = useState([]);
+      const [currentRound,  setCurrentRound]  = useState([]);
+      const [roundIndex,    setRoundIndex]    = useState(0);
+      const [credits,       setCredits]       = useState(100);
+      const [imprints,      setImprints]      = useState([]);
+      const [streak,        setStreak]        = useState(0);
+      const [factionWar,    setFactionWar]    = useState({ ra:0, anubis:0, mode:'safe', stabilityFee:3 });
+      const [leaderboard,   setLeaderboard]   = useState([]);
+      const [simulateAbsence, setSimulateAbsence] = useState(false);
+
+      useEffect(() => {
+        if (!supabase) { setLoading(false); return; }
+        supabase.auth.getSession().then(({ data:{ session } }) => {
+          setSession(session);
+          if (session) loadProfile(session);
+          else setLoading(false);
+        });
+        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+          setSession(session);
+          if (session) loadProfile(session);
+          else { setProfile(null); setView('auth'); setLoading(false); }
+        });
+        return () => listener?.subscription.unsubscribe();
+      }, []);
+
+      async function loadProfile(session) {
+        if (!session || !supabase) return;
+        const { data, error } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+        if (data && !error) {
+          // --- STREAK LOGIC ---
+          let newStreak = data.streak || 1;
+          let newLastLogin = data.last_login;
+          const today = new Date().toISOString().split('T')[0];
+          const lastLoginDate = data.last_login ? new Date(data.last_login).toISOString().split('T')[0] : null;
+          if (lastLoginDate !== today) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            if (lastLoginDate === yesterdayStr) {
+              newStreak = (data.streak || 1) + 1;
+            } else {
+              newStreak = 1;
+            }
+            newLastLogin = new Date().toISOString();
+            await supabase.from('profiles').update({ streak: newStreak, last_login: newLastLogin }).eq('id', session.user.id);
+          }
+          // ---------------------
+          const updatedData = { ...data, streak: newStreak, last_login: newLastLogin };
+          setProfile(updatedData);
+          setSelectedForce(updatedData.force);
+          setCredits(updatedData.credits ?? 100);
+          setStreak(newStreak);
+          setImprints(updatedData.imprints || []);
+          await loadQuestions();
+          await loadLeaderboard();
+          await loadFactionWar();
+          setView(updatedData.force ? 'hub' : 'onboarding');
+        } else {
+          const newProfile = {
+            id: session.user.id,
+            display_name: session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Scribe',
+            force: null, credits: 100, streak: 1, imprints: [], total_score: 0,
+            last_login: new Date().toISOString(), last_submission_date: null, submission_count: 0
+          };
+          await supabase.from('profiles').insert(newProfile);
+          setProfile(newProfile);
+          setStreak(1);
+          await loadQuestions();
+          await loadLeaderboard();
+          await loadFactionWar();
+          setView('onboarding');
+        }
+        setLoading(false);
+      }
+
+      async function loadQuestions() {
+        if (!supabase) { setQuestionsDB(FULL_SEED); return; }
+        try {
+          let { data, error } = await supabase.from('questions').select('*').eq('is_active', true).limit(300);
+          if (error || !data || data.length < 10) {
+            // Only seed once: check if any questions exist at all
+            const { count } = await supabase.from('questions').select('*', { count: 'exact', head: true });
+            if (count === 0) {
+              for (const q of FULL_SEED) {
+                await supabase.from('questions').upsert([q], { onConflict: 'id' });
+              }
+            }
+            const { data: fresh } = await supabase.from('questions').select('*').eq('is_active', true);
+            data = fresh || FULL_SEED;
+          }
+          setQuestionsDB(data && data.length ? data : FULL_SEED);
+        } catch (err) {
+          console.error("Failed to load questions:", err);
+          setQuestionsDB(FULL_SEED);
+        }
+      }
+
+      async function loadLeaderboard() {
+        if (!supabase) return;
+        const { data } = await supabase.from('profiles').select('display_name,total_score').order('total_score',{ ascending:false }).limit(10);
+        setLeaderboard(data || []);
+      }
+
+      async function loadFactionWar() {
+        if (!supabase) return;  // FIXED: added safety check
+        await supabase.from('faction_scores').upsert(
+          [{ faction:'ra', score:100 }, { faction:'anubis', score:80 }],
+          { onConflict:'faction', ignoreDuplicates:true }
+        );
+        const { data: raData }    = await supabase.from('faction_scores').select('score').eq('faction','ra').maybeSingle();
+        const { data: anubisData} = await supabase.from('faction_scores').select('score').eq('faction','anubis').maybeSingle();
+        const ra     = raData?.score ?? 100;
+        const anubis = anubisData?.score ?? 80;
+        const mode   = ra >= anubis ? 'safe' : 'curse';
+        setFactionWar({ ra, anubis, mode, stabilityFee: mode==='safe' ? 3 : 10 });
+      }
+
+      function startNewRound() {
+        const db = questionsDB.length ? questionsDB : FULL_SEED;
+        const shuffled = [...db].sort(() => 0.5 - Math.random());
+        setCurrentRound(shuffled.slice(0, 3));
+        setRoundIndex(0);
+        setView('play');
+      }
+
+      async function updateProfile(changes) {
+        if (!profile) return;
+        if (supabase) {
+          const { error } = await supabase.from('profiles').update(changes).eq('id', profile.id);
+          if (!error) setProfile({...profile, ...changes});
+        } else {
+          setProfile({...profile, ...changes});
+        }
+        if (changes.credits !== undefined) setCredits(changes.credits);
+        if (changes.streak !== undefined) setStreak(changes.streak);
+      }
+
+      async function updateFactionScore(forceId, points) {
+        if (!supabase) return;
+        const target = (forceId==='ra' || forceId==='horus') ? 'ra' : 'anubis';
+        const { data } = await supabase.from('faction_scores').select('score').eq('faction', target).maybeSingle();
+        if (data) {
+          await supabase.from('faction_scores').update({ score: data.score + points }).eq('faction', target);
+          await loadFactionWar();
+        }
+      }
+
+      async function consecrate(questionId, cost) {
+        if (credits < cost) { alert("Not enough credits"); return; }
+        const newCredits     = credits - cost;
+        const updatedImprints = [...imprints, questionId];
+        await updateProfile({ credits: newCredits, imprints: updatedImprints });
+        if (supabase) {
+          await supabase.from('imprints').upsert(
+            { question_id:questionId, player_name:profile.display_name, force:selectedForce, timestamp:new Date().toISOString() },
+            { onConflict:'question_id' }
+          );
+        }
+        setImprints(updatedImprints);
+        await updateFactionScore(selectedForce, 15);
+        alert(`✨ ${profile.display_name} claimed this truth! Faction score boosted.`);
+      }
+
+      async function triggerOverwrite(questionId, currentOwner) {
+        if (credits < 60) { alert("Not enough credits to overwrite"); return; }
+        const newCredits = credits - 60;
+        await updateProfile({ credits: newCredits });
+        if (supabase) {
+          await supabase.from('imprints').upsert(
+            { question_id:questionId, player_name:profile.display_name, force:selectedForce, timestamp:new Date().toISOString() },
+            { onConflict:'question_id' }
+          );
+        }
+        await updateFactionScore(selectedForce, 10);
+        alert(`🔥 ${profile.display_name} has overwritten the truth of ${currentOwner}!`);
+      }
+
+      async function submitNewQuestion(questionData) {
+        if (!profile) return;
+        const today = new Date().toISOString().split('T')[0];
+        let currentCount = profile.submission_count || 0;
+        if (profile.last_submission_date !== today) {
+          currentCount = 0;
+          await updateProfile({ last_submission_date: today, submission_count: 0 });
+        }
+        if (currentCount >= 3) { alert(t.rateLimit); return; }
+        const approved = Math.random() < 0.8;
+        if (approved) {
+          questionData.is_active   = true;
+          questionData.votes_for   = 4;
+          questionData.votes_against = 1;
+          questionData.submitted_by  = profile.display_name;
+          questionData.approved_at   = new Date().toISOString();
+          if (supabase) await supabase.from('questions').insert([questionData]);
+          await updateProfile({ submission_count: currentCount + 1 });
+          alert(t.sealedOfRa);
+          await loadQuestions();
+        } else {
+          alert(t.rejected);
+        }
+        setView('hub');
+      }
+
+      const handleSignIn  = (email, password)       => supabase.auth.signInWithPassword({ email, password });
+      const handleSignUp  = (email, password, name) => supabase.auth.signUp({ email, password, options:{ data:{ display_name:name } } });
+      const handleSignOut = async () => { if (supabase) await supabase.auth.signOut(); setView('auth'); };
+      const selectForce   = async (force) => { setSelectedForce(force); await updateProfile({ force }); setView('hub'); };
+
+      // ---- RENDER ----
+      if (loading) return (
+        <div className="min-h-screen flex items-center justify-center bg-black">
+          <p className="text-amber-400 text-xl tracking-widest flame-animate">{t.loading}</p>
+        </div>
+      );
+      if (view === 'auth')       return <AuthScreen onSignIn={handleSignIn} onSignUp={handleSignUp} />;
+      if (view === 'onboarding') return <OnboardingScreen onSelectForce={selectForce} />;
+      if (view === 'hub')        return (
+        <HubScreen profile={profile} credits={credits} streak={streak} imprints={imprints}
+          factionWar={factionWar} leaderboard={leaderboard}
+          onStartRound={startNewRound} onSignOut={handleSignOut}
+          onViewSubmit={() => setView('submit')} onViewScroll={() => setView('scroll')}
+          simulateAbsence={simulateAbsence} setSimulateAbsence={setSimulateAbsence} />
+      );
+      if (view === 'play') return (
+        <PlayScreen round={currentRound} roundIndex={roundIndex} setRoundIndex={setRoundIndex}
+          selectedForce={selectedForce} credits={credits} setCredits={setCredits}
+          profile={profile} updateProfile={updateProfile}
+          onFinish={() => { loadLeaderboard(); setView('hub'); }}
+          consecrate={consecrate} triggerOverwrite={triggerOverwrite}
+          stabilityFeePercent={factionWar.stabilityFee} />
+      );
+      if (view === 'submit') return <SubmitScreen onSubmit={submitNewQuestion} onBack={() => setView('hub')} />;
+      if (view === 'scroll')  return <ScrollScreen leaderboard={leaderboard} onBack={() => setView('hub')} />;
+      return null;
+    };
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
