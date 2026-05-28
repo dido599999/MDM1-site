@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<title>MDm1 — بوابة الفراعنة</title>
+<meta name="description" content="ادخل الهرم واكتشف أسراره — لعبة MDm1 التفاعلية"/>
+<link rel="canonical" href="https://mdm1.org/game/"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet"/>
+
+<style>
+/* ═══════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════ */
+:root {
+  --gold:    #d4af37;
+  --gold2:   #f6d57a;
+  --gold-dim:rgba(212,175,55,0.18);
+  --red:     #cc2222;
+  --void:    #03020a;
+  --text:    #ede0c4;
+  --pale:    #fff8dc;
+  --card:    rgba(10,8,20,0.92);
+  --border:  rgba(212,175,55,0.22);
+  --correct: #2ecc71;
+  --wrong:   #e74c3c;
+  --r: 0.75rem;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════
+   SCENE BACKGROUND
+═══════════════════════════════ */
+#scene-bg {
+  position: fixed; inset: 0; z-index: 0;
+  transition: background 2s ease, opacity 1.5s ease;
+  background: radial-gradient(ellipse at 50% 30%, #3d1f00 0%, #1a0a00 50%, #03020a 100%);
+}
+#scene-overlay {
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none;
+  transition: opacity 1.5s ease;
+  opacity: 0;
+}
+#particles-canvas {
+  position: fixed; inset: 0; z-index: 2;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════
+   HIEROGLYPHS FLOATING
+═══════════════════════════════ */
+.hiero {
+  position: fixed;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  color: rgba(212,175,55,0.1);
+  pointer-events: none;
+  z-index: 2;
+  user-select: none;
+  animation: floatHiero linear infinite;
+}
+@keyframes floatHiero {
+  0%   { transform: translateY(110vh) rotate(0deg); opacity:0; }
+  8%   { opacity:0.25; }
+  92%  { opacity:0.25; }
+  100% { transform: translateY(-15vh) rotate(360deg); opacity:0; }
+}
+
+/* ═══════════════════════════════
+   GUARDIAN (كاهن / مومياء)
+═══════════════════════════════ */
+#guardian {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  width: clamp(80px, 18vw, 160px);
+  opacity: 0;
+  transition: opacity 1.2s ease, transform 1.2s ease;
+  filter: drop-shadow(0 0 20px rgba(212,175,55,0.3));
+  pointer-events: none;
+}
+#guardian.visible {
+  opacity: 1;
+  animation: guardianFloat 5s ease-in-out infinite;
+}
+@keyframes guardianFloat {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(-12px); }
+}
+
+/* ═══════════════════════════════
+   MUMMY SCARE
+═══════════════════════════════ */
+#mummy-scare {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.4s ease;
+}
+#mummy-scare.show { opacity: 1; }
+#mummy-scare span {
+  font-size: clamp(5rem, 20vw, 14rem);
+  filter: drop-shadow(0 0 40px rgba(100,0,0,0.8));
+  animation: mummyPulse 0.6s ease-in-out 3;
+}
+@keyframes mummyPulse {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
+}
+
+/* ═══════════════════════════════
+   MAIN GAME CARD
+═══════════════════════════════ */
+#game-card {
+  position: relative; z-index: 10;
+  width: min(94vw, 560px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: clamp(16px, 4vw, 32px);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 30px rgba(212,175,55,0.05);
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* ═══════════════════════════════
+   HEADER BAR
+═══════════════════════════════ */
+#header-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px; flex-wrap: wrap;
+}
+.stat-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(212,175,55,0.07);
+  border: 1px solid var(--gold-dim);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: clamp(0.78rem, 2vw, 0.9rem);
+  font-weight: 700;
+  color: var(--gold2);
+}
+.stat-chip .val { color: #fff; font-family: 'Cinzel', serif; }
+
+/* ═══════════════════════════════
+   LEVEL LABEL
+═══════════════════════════════ */
+#level-label {
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.65rem, 2vw, 0.78rem);
+  letter-spacing: 5px;
+  color: rgba(212,175,55,0.5);
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════
+   PRIEST MESSAGE
+═══════════════════════════════ */
+#priest-msg {
+  background: rgba(212,175,55,0.04);
+  border-right: 3px solid rgba(212,175,55,0.3);
+  border-radius: 0 12px 12px 0;
+  padding: 10px 16px;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  color: rgba(212,175,55,0.75);
+  font-style: italic;
+  min-height: 44px;
+  line-height: 1.7;
+  transition: opacity 0.5s;
+}
+
+/* ═══════════════════════════════
+   QUESTION
+═══════════════════════════════ */
+#question-text {
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.75;
+  text-align: center;
+  color: var(--pale);
+  min-height: 60px;
+  padding: 8px 4px;
+}
+#question-divider {
+  width: 60%; height: 1px; margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  position: relative;
+}
+#question-divider::before {
+  content: '𓂀';
+  position: absolute; top: -10px; left: 50%;
+  transform: translateX(-50%);
+  color: rgba(212,175,55,0.35);
+  font-size: 1rem;
+  background: var(--void);
+  padding: 0 6px;
+}
+
+/* ═══════════════════════════════
+   OPTIONS
+═══════════════════════════════ */
+#options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.opt-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(212,175,55,0.15);
+  border-radius: 14px;
+  padding: 14px 10px;
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  font-size: clamp(0.82rem, 2.2vw, 0.95rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  text-align: center;
+  line-height: 1.4;
+  position: relative;
+  overflow: hidden;
+}
+.opt-btn:hover {
+  background: rgba(212,175,55,0.1);
+  border-color: rgba(212,175,55,0.4);
+  transform: translateY(-2px);
+}
+.opt-btn:active { transform: translateY(0); }
+.opt-btn.correct {
+  background: rgba(46,204,113,0.18);
+  border-color: var(--correct);
+  color: #afffcc;
+}
+.opt-btn.wrong {
+  background: rgba(231,76,60,0.18);
+  border-color: var(--wrong);
+  color: #ffaaaa;
+  animation: shake 0.4s ease;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+.opt-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(212,175,55,0.12) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.opt-btn:hover::before { opacity: 1; }
+
+/* ═══════════════════════════════
+   BOTTOM BAR
+═══════════════════════════════ */
+#bottom-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px; flex-wrap: wrap;
+}
+.btn-hint {
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  color: rgba(212,175,55,0.6);
+  border-radius: 20px;
+  padding: 7px 18px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.btn-hint:hover { border-color: var(--gold); color: var(--gold); }
+
+#back-link {
+  color: rgba(255,255,255,0.2);
+  font-size: 0.75rem;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+#back-link:hover { color: rgba(212,175,55,0.5); }
+
+/* ═══════════════════════════════
+   FEEDBACK TOAST
+═══════════════════════════════ */
+#feedback-toast {
+  position: fixed; top: 24px; left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  padding: 10px 28px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  z-index: 100;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+}
+#feedback-toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ═══════════════════════════════
+   LOADING OVERLAY
+═══════════════════════════════ */
+#loading-overlay {
+  position: absolute; inset: 0;
+  background: rgba(3,2,10,0.85);
+  border-radius: 24px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 20;
+}
+#loading-overlay.show { display: flex; }
+.loading-eye {
+  font-size: 2.4rem;
+  animation: eyePulse 1.4s ease-in-out infinite;
+}
+@keyframes eyePulse {
+  0%,100% { transform: scale(1); opacity:0.7; }
+  50%      { transform: scale(1.2); opacity:1; }
+}
+.loading-text {
+  font-size: 0.85rem;
+  color: rgba(212,175,55,0.6);
+  letter-spacing: 2px;
+}
+
+/* ═══════════════════════════════
+   LEVEL UP OVERLAY
+═══════════════════════════════ */
+#levelup-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column; gap: 20px;
+  background: radial-gradient(ellipse at center, rgba(212,175,55,0.15) 0%, rgba(3,2,10,0.97) 70%);
+  animation: fadeIn 0.6s ease;
+}
+#levelup-overlay.show { display: flex; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.levelup-icon { font-size: clamp(4rem, 15vw, 7rem); animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+.levelup-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  color: var(--gold2);
+  text-shadow: 0 0 30px var(--gold);
+  text-align: center;
+  letter-spacing: 3px;
+}
+.levelup-sub { color: rgba(212,175,55,0.6); font-size: 0.9rem; letter-spacing: 4px; }
+.btn-continue {
+  background: linear-gradient(135deg, #f8dc88, #8b6914);
+  color: #000;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 44px;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 3px;
+  cursor: pointer;
+  box-shadow: 0 0 40px rgba(212,175,55,0.4);
+  transition: 0.3s;
+  margin-top: 10px;
+}
+.btn-continue:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 0 60px rgba(212,175,55,0.6); }
+
+/* ═══════════════════════════════
+   GAME OVER OVERLAY
+═══════════════════════════════ */
+#gameover-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column; gap: 18px;
+  background: radial-gradient(ellipse at center, rgba(100,0,0,0.2) 0%, rgba(3,2,10,0.97) 70%);
+}
+#gameover-overlay.show { display: flex; }
+.gameover-icon { font-size: clamp(3.5rem, 12vw, 6rem); }
+.gameover-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  color: #ff6060;
+  text-align: center;
+}
+.gameover-score { color: var(--gold); font-size: 1.1rem; }
+.btn-restart {
+  background: rgba(212,175,55,0.12);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 999px;
+  padding: 12px 36px;
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.btn-restart:hover { background: rgba(212,175,55,0.2); }
+.btn-home {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 10px 30px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.3s;
+}
+.btn-home:hover { color: rgba(255,255,255,0.7); }
+
+/* ═══════════════════════════════
+   REGISTER PROMPT
+═══════════════════════════════ */
+#register-prompt {
+  position: fixed; inset: 0; z-index: 70;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(3,2,10,0.92);
+  backdrop-filter: blur(10px);
+}
+#register-prompt.show { display: flex; }
+.register-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: clamp(24px,5vw,40px);
+  width: min(90vw, 420px);
+  display: flex; flex-direction: column; gap: 16px;
+  text-align: center;
+}
+.register-box h2 {
+  font-family: 'Cinzel', serif;
+  color: var(--gold2);
+  font-size: 1.3rem;
+}
+.register-box p { color: rgba(212,175,55,0.6); font-size: 0.88rem; line-height: 1.8; }
+.reg-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.3s;
+  direction: rtl;
+}
+.reg-input:focus { border-color: var(--gold); }
+.reg-input::placeholder { color: rgba(255,255,255,0.25); }
+.btn-register {
+  background: linear-gradient(135deg, #f8dc88, #8b6914);
+  color: #000; border: none; border-radius: 12px;
+  padding: 13px; font-weight: 900;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1rem; cursor: pointer;
+  transition: 0.3s;
+}
+.btn-register:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(212,175,55,0.4); }
+.btn-skip-reg {
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.25); font-size: 0.8rem;
+  cursor: pointer; font-family: 'Tajawal', sans-serif;
+  transition: color 0.3s;
+}
+.btn-skip-reg:hover { color: rgba(255,255,255,0.5); }
+
+/* ═══════════════════════════════
+   HINT BOX
+═══════════════════════════════ */
+#hint-box {
+  background: rgba(212,175,55,0.06);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  color: rgba(212,175,55,0.75);
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+#hint-box.show { display: block; }
+
+/* ═══════════════════════════════
+   STREAK
+═══════════════════════════════ */
+#streak-msg {
+  position: fixed; top: 80px; left: 50%;
+  transform: translateX(-50%) scale(0);
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  text-shadow: 0 0 20px var(--gold);
+  z-index: 80;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space: nowrap;
+}
+#streak-msg.show { transform: translateX(-50%) scale(1); }
+
+/* ═══════════════════════════════
+   LIVES HEARTS ANIMATION
+═══════════════════════════════ */
+.heart-lose { animation: heartLose 0.5s ease; }
+@keyframes heartLose {
+  0%   { transform: scale(1.4); filter: drop-shadow(0 0 8px red); }
+  100% { transform: scale(1); }
+}
+
+/* ═══════════════════════════════
+   RESPONSIVE
+═══════════════════════════════ */
+@media (max-width: 400px) {
+  #options-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- خلفية المشهد -->
+<div id="scene-bg"></div>
+<div id="scene-overlay"></div>
+<canvas id="particles-canvas"></canvas>
+
+<!-- مومياء الرعب -->
+<div id="mummy-scare"><span>𓂀</span></div>
+
+<!-- الحارس -->
+<div id="guardian"></div>
+
+<!-- رسالة الإنجاز -->
+<div id="streak-msg"></div>
+
+<!-- التوست -->
+<div id="feedback-toast"></div>
+
+<!-- ══════════════ البطاقة الرئيسية ══════════════ -->
+<div id="game-card">
+
+  <!-- تحميل -->
+  <div id="loading-overlay">
+    <div class="loading-eye">𓂀</div>
+    <div class="loading-text" id="loading-text">الكاهن يستدعي سؤالاً...</div>
+  </div>
+
+  <!-- الهيدر -->
+  <div id="header-bar">
+    <div class="stat-chip">❤️ <span class="val" id="lives-val">3</span></div>
+    <div class="stat-chip">⭐ <span class="val" id="score-val">0</span></div>
+    <div class="stat-chip">🔥 <span class="val" id="streak-val">0</span></div>
+  </div>
+
+  <!-- رقم المستوى -->
+  <div id="level-label">— المستوى <span id="level-num">1</span> —</div>
+
+  <!-- رسالة الكاهن -->
+  <div id="priest-msg">✦ ادخل الهرم واكتشف أسراره...</div>
+
+  <!-- الفاصل -->
+  <div id="question-divider"></div>
+
+  <!-- السؤال -->
+  <div id="question-text"></div>
+
+  <!-- الخيارات -->
+  <div id="options-grid">
+    <button class="opt-btn" id="opt-0" onclick="GAME_UI.answer(0)"></button>
+    <button class="opt-btn" id="opt-1" onclick="GAME_UI.answer(1)"></button>
+    <button class="opt-btn" id="opt-2" onclick="GAME_UI.answer(2)"></button>
+    <button class="opt-btn" id="opt-3" onclick="GAME_UI.answer(3)"></button>
+  </div>
+
+  <!-- التلميح -->
+  <div id="hint-box"></div>
+
+  <!-- البار السفلي -->
+  <div id="bottom-bar">
+    <button class="btn-hint" id="hint-btn" onclick="GAME_UI.hint()">💡</button>
+    <a id="back-link" href="https://mdm1.org">← MDm1</a>
+  </div>
+
+</div>
+
+<!-- ══════════════ ترقي المستوى ══════════════ -->
+<div id="levelup-overlay">
+  <div class="levelup-icon">🏛️</div>
+  <div class="levelup-title" id="levelup-title">باب جديد يفتح...</div>
+  <div class="levelup-sub" id="levelup-sub">المستوى 2</div>
+  <button class="btn-continue" id="levelup-btn">المضي قُدُماً ✦</button>
+</div>
+
+<!-- ══════════════ نهاية اللعبة ══════════════ -->
+<div id="gameover-overlay">
+  <div class="gameover-icon">💀</div>
+  <div class="gameover-title" id="gameover-title">انتهت المحاولات</div>
+  <div class="gameover-score">نقاطك: <span id="final-score">0</span></div>
+  <button class="btn-restart" id="restart-btn">المحاولة مجدداً</button>
+  <a class="btn-home" href="https://mdm1.org">العودة للموقع</a>
+</div>
+
+<!-- ══════════════ التسجيل ══════════════ -->
+<div id="register-prompt">
+  <div class="register-box">
+    <div style="font-size:2.5rem">👁️</div>
+    <h2>سجّل لحفظ تقدمك</h2>
+    <p>وصلت لمستوى متقدم...<br/>سجّل لحفظ نقاطك والمنافسة على الجوائز</p>
+    <input class="reg-input" id="reg-name" type="text" placeholder="اسمك"/>
+    <input class="reg-input" id="reg-email" type="email" placeholder="البريد الإلكتروني أو رقم الهاتف"/>
+    <button class="btn-register" onclick="GAME_UI.register()">دخول الهرم ✦</button>
+    <button class="btn-skip-reg" onclick="GAME_UI.skipRegister()">تخطي الآن</button>
+  </div>
+</div>
+
+<!-- ══════════════ الهيروغليف الطائر ══════════════ -->
+<script>
+const hieroglyphs = ["𓂀","𓃭","𓅃","𓆣","𓇯","𓉐","𓊪","𓏏","𓐍","𓀭","𓁹","𓂋","𓄿","𓅱","𓆑"];
+for(let i=0;i<10;i++){
+  const h=document.createElement("div");
+  h.className="hiero";
+  h.textContent=hieroglyphs[Math.floor(Math.random()*hieroglyphs.length)];
+  h.style.left=Math.random()*95+"%";
+  h.style.animationDuration=(14+Math.random()*14)+"s";
+  h.style.animationDelay=(-Math.random()*20)+"s";
+  h.style.fontSize=(1.2+Math.random()*1.4)+"rem";
+  document.body.appendChild(h);
+}
+</script>
+
+<!-- ══════════════ SCENE MODULE ══════════════ -->
+<script>
+const SCENE = (() => {
+  const bg = document.getElementById("scene-bg");
+  const overlay = document.getElementById("scene-overlay");
+  const guardian = document.getElementById("guardian");
+  const mummy = document.getElementById("mummy-scare");
+  const canvas = document.getElementById("particles-canvas");
+  const ctx = canvas.getContext("2d");
+  let particles = [];
+  let animFrame;
+  let currentMode = "dawn";
+
+  const SCENES = {
+    dawn:      { bg: "radial-gradient(ellipse at 50% 20%, #6b3a00 0%, #3d1f00 40%, #03020a 100%)", overlay: "none", guardianEmoji: "🧙" },
+    dusk:      { bg: "radial-gradient(ellipse at 50% 30%, #2a1a0a 0%, #0d0a1a 50%, #03020a 100%)", overlay: "rgba(30,10,0,0.4)", guardianEmoji: "🧎" },
+    night:     { bg: "radial-gradient(ellipse at 40% 20%, #050520 0%, #0a0510 50%, #03020a 100%)", overlay: "rgba(5,0,20,0.5)", guardianEmoji: "⚖️" },
+    dark:      { bg: "radial-gradient(ellipse at 50% 50%, #080308 0%, #030308 60%, #020203 100%)", overlay: "rgba(0,0,0,0.6)", guardianEmoji: "🧟" },
+    sacred:    { bg: "radial-gradient(ellipse at 50% 30%, #251500 0%, #1a0a00 40%, #03020a 100%)", overlay: "none", guardianEmoji: "𓂀" },
+    golden_light: { bg: "radial-gradient(ellipse at 50% 10%, #5a3a00 0%, #3d2200 40%, #03020a 100%)", overlay: "rgba(212,175,55,0.08)", guardianEmoji: "☀️" },
+    dark_mist:    { bg: "radial-gradient(ellipse at 50% 80%, #0d0a10 0%, #050508 60%, #020203 100%)", overlay: "rgba(10,5,20,0.5)", guardianEmoji: "🌫️" },
+    red_glow:     { bg: "radial-gradient(ellipse at 50% 80%, #200a00 0%, #100500 60%, #03020a 100%)", overlay: "rgba(80,0,0,0.15)", guardianEmoji: "🔥" },
+    amber_glow:   { bg: "radial-gradient(ellipse at 50% 30%, #2a1800 0%, #150d00 50%, #03020a 100%)", overlay: "none", guardianEmoji: "🕯️" },
+    pulse_light:  { bg: "radial-gradient(ellipse at 50% 50%, #0a0a1a 0%, #050510 50%, #03020a 100%)", overlay: "rgba(100,80,200,0.05)", guardianEmoji: "🔮" },
+    blue_shimmer: { bg: "radial-gradient(ellipse at 60% 30%, #00102a 0%, #000a1a 50%, #03020a 100%)", overlay: "rgba(0,50,100,0.1)", guardianEmoji: "🔭" },
+    dark_pulse:   { bg: "radial-gradient(ellipse at 50% 50%, #0a0308 0%, #050205 60%, #020202 100%)", overlay: "rgba(50,0,0,0.2)", guardianEmoji: "💀" },
+  };
+
+  function applyAtmosphere(type) {
+    const mode = type.sceneOverlay === "none" ? "dawn" : type.sceneOverlay;
+    const scene = SCENES[mode] || SCENES.dawn;
+    bg.style.background = scene.bg;
+    if(scene.overlay !== "none") {
+      overlay.style.background = scene.overlay;
+      overlay.style.opacity = "1";
+    } else {
+      overlay.style.opacity = "0";
+    }
+    // الحارس
+    guardian.textContent = scene.guardianEmoji;
+    guardian.style.fontSize = "clamp(3rem,10vw,6rem)";
+    guardian.classList.add("visible");
+    // جسيمات
+    spawnParticles(type.sceneOverlay);
+  }
+
+  function spawnParticles(mode) {
+    particles = [];
+    const count = 40;
+    for(let i=0;i<count;i++){
+      particles.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        r: Math.random()*1.8+0.4,
+        sx: (Math.random()-0.5)*0.3,
+        sy: (Math.random()-0.5)*0.3,
+        a: Math.random()*0.4+0.05,
+        color: mode === "golden_light" ? "212,175,55" :
+               mode === "red_glow"     ? "180,30,30" :
+               mode === "blue_shimmer" ? "80,140,220" :
+               "212,175,55"
+      });
+    }
+  }
+
+  function drawParticles() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(${p.color},${p.a})`;
+      ctx.fill();
+      p.x+=p.sx; p.y+=p.sy;
+      if(p.x<0||p.x>canvas.width)  p.sx*=-1;
+      if(p.y<0||p.y>canvas.height) p.sy*=-1;
+    });
+    animFrame = requestAnimationFrame(drawParticles);
+  }
+
+  function playCorrect() {
+    overlay.style.background = "rgba(46,204,113,0.08)";
+    overlay.style.opacity = "1";
+    setTimeout(() => overlay.style.opacity="0", 700);
+  }
+
+  function playWrong(type) {
+    if(type && type.allowJump) showMummyScare();
+    overlay.style.background = "rgba(200,30,30,0.12)";
+    overlay.style.opacity = "1";
+    setTimeout(() => overlay.style.opacity="0", 800);
+  }
+
+  function showMummyScare() {
+    mummy.classList.add("show");
+    setTimeout(() => mummy.classList.remove("show"), 1800);
+  }
+
+  function playLevelUp(level) {
+    bg.style.background = "radial-gradient(ellipse at 50% 30%, #5a3a00 0%, #2a1800 40%, #03020a 100%)";
+    overlay.style.background = "rgba(212,175,55,0.12)";
+    overlay.style.opacity = "1";
+    setTimeout(() => overlay.style.opacity="0", 2000);
+  }
+
+  function playGameOver() {
+    bg.style.background = "radial-gradient(ellipse at 50% 100%, #200000 0%, #0a0000 60%, #020202 100%)";
+  }
+
+  function reset() {
+    cancelAnimationFrame(animFrame);
+    particles=[];
+    bg.style.background = "radial-gradient(ellipse at 50% 30%, #3d1f00 0%, #1a0a00 50%, #03020a 100%)";
+    overlay.style.opacity="0";
+    guardian.classList.remove("visible");
+  }
+
+  function init() {
+    window.addEventListener("resize", () => { canvas.width=window.innerWidth; canvas.height=window.innerHeight; });
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    spawnParticles("dawn");
+    drawParticles();
+  }
+
+  return { init, applyAtmosphere, playCorrect, playWrong, playLevelUp, playGameOver, reset };
+})();
+</script>
+
+<!-- ══════════════ UI MODULE ══════════════ -->
+<script>
+const UI = (() => {
+  let _callbacks = {};
+  let _state = {};
+  let _hintUsed = false;
+  let toastTimer = null;
+  let streakTimer = null;
+
+  function init(state, callbacks) {
+    _state = state;
+    _callbacks = callbacks;
+    _hintUsed = false;
+    document.getElementById("restart-btn").onclick = callbacks.reset;
+    document.getElementById("levelup-btn").onclick = () => {
+      document.getElementById("levelup-overlay").classList.remove("show");
+      if(_callbacks._levelUpCb) _callbacks._levelUpCb();
+    };
+    updateStats(state);
+    // اتجاه حسب اللغة
+    document.documentElement.dir = state.lang === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = state.lang;
+  }
+
+  function updateStats(state) {
+    document.getElementById("lives-val").textContent  = "❤️".repeat(Math.max(0,state.lives));
+    document.getElementById("score-val").textContent  = state.score;
+    document.getElementById("streak-val").textContent = state.streak > 0 ? "🔥×"+state.streak : "—";
+    document.getElementById("level-num").textContent  = state.level;
+  }
+
+  function renderQuestion(q, state) {
+    hideLoading();
+    _hintUsed = false;
+    document.getElementById("hint-box").classList.remove("show");
+    document.getElementById("question-text").textContent = q.text;
+
+    // مستوى الكاهن
+    const lvlData = LEVELS[Math.min(state.level-1, LEVELS.length-1)];
+    const msg = lvlData?.priestMessage?.[state.lang] || lvlData?.priestMessage?.ar || "...";
+    document.getElementById("priest-msg").textContent = "✦ " + msg;
+
+    // الخيارات
+    for(let i=0;i<4;i++){
+      const btn = document.getElementById("opt-"+i);
+      btn.textContent = q.options[i] || "";
+      btn.className = "opt-btn";
+      btn.disabled = false;
+    }
+    updateStats(state);
+  }
+
+  function showFeedback(correct, msg, state) {
+    const idx = state.currentQuestion?.correct ?? -1;
+    // تلوين الإجابات
+    for(let i=0;i<4;i++){
+      const btn = document.getElementById("opt-"+i);
+      btn.disabled = true;
+      if(i === idx) btn.classList.add("correct");
+    }
+    if(!correct) {
+      // ايجاد الزر المضغوط — سيكون قد تم في answer()
+    }
+    showToast(msg, correct ? "#2ecc71" : "#e74c3c");
+    updateStats(state);
+  }
+
+  function showToast(msg, color="#d4af37") {
+    const t = document.getElementById("feedback-toast");
+    t.textContent = msg;
+    t.style.borderColor = color;
+    t.style.color = color;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 1600);
+  }
+
+  function showMsg(msg) { showToast(msg); }
+
+  function showHint(hint) {
+    const box = document.getElementById("hint-box");
+    box.textContent = "💡 " + hint;
+    box.classList.add("show");
+  }
+
+  function showStreakMsg(msg) {
+    const el = document.getElementById("streak-msg");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(streakTimer);
+    streakTimer = setTimeout(() => el.classList.remove("show"), 2000);
+  }
+
+  function showLevelUp(level, msg, cb) {
+    _callbacks._levelUpCb = cb;
+    const lvlData = LEVELS[Math.min(level-1, LEVELS.length-1)];
+    document.getElementById("levelup-title").textContent = msg;
+    document.getElementById("levelup-sub").textContent =
+      (lvlData ? (lvlData.nameAr || lvlData.nameEn) : "المستوى "+level);
+    document.getElementById("levelup-overlay").classList.add("show");
+    document.getElementById("levelup-btn").textContent = _callbacks.t("nextLevel") + " ✦";
+  }
+
+  function showGameOver(score, msg, tryAgain, backHome, cb) {
+    document.getElementById("gameover-title").textContent = msg;
+    document.getElementById("final-score").textContent = score;
+    document.getElementById("restart-btn").textContent = tryAgain;
+    document.getElementById("gameover-overlay").classList.add("show");
+  }
+
+  function showRegisterPrompt(msg) {
+    document.getElementById("register-prompt").classList.add("show");
+  }
+
+  function hideRegisterPrompt() {
+    document.getElementById("register-prompt").classList.remove("show");
+  }
+
+  function showLoading(msg) {
+    document.getElementById("loading-text").textContent = msg;
+    document.getElementById("loading-overlay").classList.add("show");
+    for(let i=0;i<4;i++) document.getElementById("opt-"+i).disabled = true;
+  }
+
+  function hideLoading() {
+    document.getElementById("loading-overlay").classList.remove("show");
+    for(let i=0;i<4;i++) document.getElementById("opt-"+i).disabled = false;
+  }
+
+  function resetUI(state) {
+    document.getElementById("gameover-overlay").classList.remove("show");
+    document.getElementById("levelup-overlay").classList.remove("show");
+    document.getElementById("hint-box").classList.remove("show");
+    _hintUsed = false;
+    updateStats(state);
+  }
+
+  return {
+    init, renderQuestion, showFeedback, showToast, showMsg,
+    showHint, showStreakMsg, showLevelUp, showGameOver,
+    showRegisterPrompt, hideRegisterPrompt,
+    showLoading, hideLoading, resetUI, updateStats
+  };
+})();
+
+// واجهة للـ HTML onclick
+const GAME_UI = {
+  answer(idx) {
+    const btn = document.getElementById("opt-"+idx);
+    if(btn.disabled) return;
+    btn.classList.add(GAME.state.currentQuestion?.correct === idx ? "correct" : "wrong");
+    GAME.state.gamePhase === "playing" && GAME._answer(idx);
+  },
+  hint() { GAME._hint(); },
+  register() {
+    const name  = document.getElementById("reg-name").value.trim();
+    const email = document.getElementById("reg-email").value.trim();
+    if(!email) { UI.showMsg("أدخل بريدك الإلكتروني"); return; }
+    GAME.state.isRegistered = true;
+    GAME.state.playerName   = name;
+    UI.hideRegisterPrompt();
+    GAME._continueAfterRegister();
+  },
+  skipRegister() {
+    UI.hideRegisterPrompt();
+    GAME._continueAfterRegister();
+  }
+};
+</script>
+
+<!-- تحميل الملفات -->
+<script src="config.js"></script>
+<script src="levels.js"></script>
+<script src="game.js"></script>
+
+</body>
+</html>
