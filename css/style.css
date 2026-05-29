@@ -1,0 +1,361 @@
+/* ── اللوحة اللونية والهوية البصرية المعتمدة ── */
+:root {
+  --gold: #c9a84c;
+  --gold-bright: #f0c060;
+  --gold-shadow: rgba(201, 168, 76, 0.25);
+  --blood: #8b1a1a;
+  --blood-bright: #cc2222;
+  --light-cream: #e8d5a3;
+  --void-black: #03020a;
+  --ink-black: #06040f;
+  --glass-card: rgba(10, 8, 20, 0.88);
+  --neon-border: rgba(201, 168, 76, 0.2);
+}
+
+/* ── التهيئة العامة والتصفير ── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--void-black);
+}
+
+body {
+  background: var(--void-black);
+  color: var(--light-cream);
+  font-family: 'Tajawal', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ── خلفية الجزيئات (Particles) ── */
+#particles-container {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.gold-dust {
+  position: absolute;
+  background: radial-gradient(circle, var(--gold-bright) 0%, transparent 80%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: floatDust infinite ease-in-out;
+}
+@keyframes floatDust {
+  0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+  50% { opacity: 0.6; }
+  100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+}
+
+/* ── زري التحكم والتنقل ── */
+.skip-story-btn {
+  position: fixed; bottom: 25px; left: 25px;
+  background: rgba(6, 4, 15, 0.8);
+  border: 1px solid var(--gold);
+  color: var(--gold-bright);
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 999;
+  backdrop-filter: blur(8px);
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+.skip-story-btn:hover {
+  background: var(--gold);
+  color: var(--void-black);
+  box-shadow: 0 0 20px var(--gold-bright);
+}
+
+/* ── قسم القصة (الفيلم التفاعلي) ── */
+.story-wrapper {
+  position: relative;
+  z-index: 5;
+}
+
+.scene {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  position: relative;
+}
+
+/* واجهة البداية Hero */
+.hero-scene {
+  text-align: center;
+}
+.eye-monument {
+  font-size: 6rem;
+  filter: drop-shadow(0 0 20px var(--gold));
+  animation: breathEye 4s infinite ease-in-out;
+  margin-bottom: 25px;
+}
+@keyframes breathEye {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px var(--gold)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 35px var(--gold-bright)); }
+}
+.main-epic-title {
+  font-family: 'Cinzel', serif;
+  font-size: 4.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffffff, var(--gold-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+}
+.epic-subtitle {
+  font-size: 1.6rem;
+  color: #b0a5cf;
+  letter-spacing: 1px;
+}
+.scroll-indicator {
+  margin-top: 50px;
+  color: var(--gold);
+  font-size: 0.95rem;
+  letter-spacing: 2px;
+  animation: bounceArrow 2s infinite;
+}
+@keyframes bounceArrow {
+  0%, 100%, 20% { transform: translateY(0); }
+  40%, 60% { transform: translateY(-8px); }
+}
+
+/* كروت الفصول الفاخرة */
+.chapter-scene {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1), transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.chapter-scene.reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.narrative-box {
+  background: var(--glass-card);
+  border: 1px solid var(--neon-border);
+  padding: 50px;
+  border-radius: 4px;
+  max-width: 750px;
+  width: 100%;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  text-align: center;
+  position: relative;
+}
+.chapter-scene.reveal-active .narrative-box {
+  border-color: var(--gold);
+  box-shadow: 0 0 40px var(--gold-shadow);
+}
+
+.ch-meta {
+  font-size: 1rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  display: block;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+.ch-title {
+  font-family: 'Cairo', sans-serif;
+  font-size: 2.2rem;
+  color: #fff;
+  margin-bottom: 25px;
+}
+.ch-desc {
+  font-size: 1.2rem;
+  line-height: 1.9;
+  color: #d1c9e3;
+  margin-bottom: 30px;
+}
+.holy-verse {
+  border-top: 1px solid var(--neon-border);
+  padding-top: 20px;
+  font-size: 1.3rem;
+  color: var(--gold-bright);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.story-visual {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  transition: transform 0.5s ease;
+}
+
+/* تأثيرات فصول معينة */
+.dark-phase { background: linear-gradient(to bottom, transparent, #020106, #090303); }
+.red-ignite { color: var(--blood-bright) !important; text-shadow: 0 0 15px var(--blood); }
+
+/* زر الخاتمة الفاخر للعبور */
+.activate-hub-btn {
+  margin-top: 30px;
+  background: linear-gradient(135deg, var(--gold), #a68433);
+  color: var(--void-black);
+  border: none;
+  padding: 16px 36px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 5px 25px var(--gold-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.activate-hub-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 35px var(--gold-bright);
+}
+
+/* ── 🏛️ واجهة الـ HUB والمنصة الرقمية ── */
+.interactive-hub-panel {
+  position: relative;
+  z-index: 10;
+  background: var(--ink-black);
+  border-top: 2px solid var(--gold);
+  padding: 120px 20px;
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 1.5s ease, transform 1.5s ease;
+}
+.interactive-hub-panel.view-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hub-inner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.hub-main-header {
+  text-align: center;
+  margin-bottom: 70px;
+}
+.hub-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  color: var(--gold-bright);
+  margin-bottom: 10px;
+}
+.hub-main-header h2 {
+  font-family: 'Cairo', sans-serif;
+  font-size: 3.2rem;
+  color: #fff;
+  font-weight: 900;
+}
+.hub-main-header p {
+  color: var(--gold);
+  font-size: 1.25rem;
+  margin-top: 15px;
+}
+
+/* شبكة كروت الـ Hub */
+.hub-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 35px;
+  margin-bottom: 60px;
+}
+.feature-card {
+  background: var(--glass-card);
+  border: 1px solid var(--neon-border);
+  padding: 40px 30px;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.feature-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(201, 168, 76, 0.12);
+}
+.icon-frame {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+}
+.feature-card h3 {
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.5rem;
+  color: #fff;
+  margin-bottom: 15px;
+}
+.feature-card p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #c1b9d2;
+}
+
+/* منطقة نسخ العقد والبيانات الحية */
+.project-token-card {
+  grid-column: span 1;
+}
+.card-badge {
+  position: absolute; top: 20px; left: 20px;
+  background: var(--blood);
+  color: #fff; font-size: 0.75rem; font-weight: 900;
+  padding: 4px 10px; border-radius: 2px; letter-spacing: 1px;
+}
+.address-copy-container {
+  background: rgba(0,0,0,0.5);
+  border: 1px dashed var(--neon-border);
+  padding: 12px; margin-top: 20px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+#tokenAddress {
+  font-family: monospace; font-size: 0.9rem; color: #a5ebd2; word-break: break-all;
+}
+.btn-copy-action {
+  background: var(--gold-shadow);
+  border: 1px solid var(--gold);
+  color: #fff; padding: 6px 12px; font-size: 0.8rem;
+  cursor: pointer; font-family: 'Cairo', sans-serif;
+}
+.btn-copy-action:hover {
+  background: var(--gold); color: var(--void-black);
+}
+.live-price-status {
+  margin-top: 15px; color: var(--gold-bright); font-weight: bold; font-size: 1.05rem;
+}
+
+/* روابط التداول والألعاب */
+.hub-navigation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+.nav-anchor {
+  display: flex; align-items: center; justify-content: center;
+  padding: 18px; font-family: 'Cairo', sans-serif; font-weight: 700;
+  font-size: 1.1rem; text-decoration: none; text-align: center;
+  transition: all 0.3s ease; border-radius: 4px; cursor: pointer;
+}
+.primary-gold-anchor {
+  background: var(--gold); color: var(--void-black);
+}
+.primary-gold-anchor:hover {
+  background: var(--gold-bright); box-shadow: 0 0 25px var(--gold);
+}
+.outline-anchor {
+  background: transparent; border: 1px solid var(--neon-border); color: #fff;
+}
+.outline-anchor:hover {
+  border-color: var(--gold); background: rgba(201, 168, 76, 0.05);
+}
+
+/* ── شاشات الهواتف المتجاوبة ── */
+@media (max-width: 768px) {
+  .main-epic-title { font-size: 3rem; }
+  .epic-subtitle { font-size: 1.2rem; }
+  .ch-title { font-size: 1.7rem; }
+  .ch-desc { font-size: 1.05rem; }
+  .hub-main-header h2 { font-size: 2.2rem; }
+}
