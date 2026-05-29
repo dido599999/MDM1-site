@@ -1,137 +1,299 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MDm1 — التجربة السينمائية والمنظومة الرقمية</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cairo:wght@400;700;900&family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDm1 — صراع الأزل</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Tajawal:wght@300;400;700;900&display=swap');
+
+  :root {
+    --gold: #c9a84c;
+    --gold-bright: #f0c060;
+    --gold-dim: #6b4f1a;
+    --blood: #8b1a1a;
+    --blood-bright: #cc2222;
+    --light: #e8d5a3;
+    --dark: #050403;
+    --void: #000000;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--void);
+    color: var(--light);
+    font-family: 'Tajawal', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* تخصيص السكرول بار الفخم */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #000; }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+  /* خلفية الجزيئات الكونية */
+  #particles {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  }
+  .p {
+    position: absolute; border-radius: 50%; background: var(--gold-bright);
+    opacity: 0; animation: float infinite linear;
+  }
+  @keyframes float {
+    0% { transform: translateY(105vh) scale(0.3); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-5vh) scale(1.2); opacity: 0; }
+  }
+
+  /* الحروف الهيروغليفية الطائرة الغامضة */
+  .hiero-fly {
+    position: fixed; font-size: 3rem; color: rgba(201, 168, 76, 0.06);
+    pointer-events: none; z-index: 1; user-select: none;
+    animation: flyUp 25s linear infinite;
+  }
+  @keyframes flyUp {
+    0% { transform: translateY(105vh) rotate(0deg); opacity: 0; }
+    20% { opacity: 0.25; }
+    80% { opacity: 0.25; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* شاشة الانترو الافتتاحية */
+  #intro {
+    position: fixed; inset: 0; z-index: 9999; background: #000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 1.5s ease, visibility 1.5s;
+  }
+  #intro.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+  .intro-eye {
+    width: 140px; height: 140px; margin-bottom: 25px; border-radius: 50%;
+    overflow: hidden; border: 2px solid var(--gold);
+    box-shadow: 0 0 50px var(--gold-dim);
+    animation: pulseEye 4s ease-in-out infinite;
+  }
+  .intro-eye img { width: 100%; height: 100%; object-fit: cover; }
+  .intro-title {
+    font-family: 'Cinzel', serif; font-size: 4rem; font-weight: 900;
+    color: var(--gold-bright); letter-spacing: 8px;
+    text-shadow: 0 0 30px var(--gold);
+  }
+  @keyframes pulseEye { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+  /* 🎬 محرك وعاء الفيلم السينمائي والـ Scroll Driven 🎬 */
+  .scroll-cinema-track {
+    position: relative; width: 100%; height: 650vh; /* مساحة كافية تتناسب مع الفصول الستة */
+  }
+  .cinema-sticky-viewport {
+    position: sticky; top: 0; width: 100%; height: 100vh;
+    overflow: hidden; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* كروت الفصول المتداخلة حركياً */
+  .cinema-frame {
+    position: absolute; width: 90%; max-width: 950px; height: 75vh;
+    border-radius: 12px; overflow: hidden; border: 1px solid rgba(201, 168, 76, 0.2);
+    box-shadow: 0 0 60px rgba(0,0,0,0.9);
+    opacity: 0; transform: scale(0.85) translateY(80px);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+    pointer-events: none;
+  }
+  .cinema-frame img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; filter: brightness(0.35) contrast(1.1);
+    transition: transform 0.6s ease;
+  }
+  /* الفريمات التي لا تحتوي على صورة مخصصة تعود للخلفية المتدرجة الفخمة القديمة */
+  .cinema-frame.no-img {
+    background: linear-gradient(135deg, #0a0812 0%, #020105 100%);
+  }
+
+  .cinema-frame.active-frame {
+    opacity: 1; transform: scale(1) translateY(0); pointer-events: auto;
+  }
+
+  /* تراكب النصوص الملحمية الأصلية فوق الصور */
+  .narrative-overlay {
+    position: absolute; inset: 0; padding: 60px;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: center; text-align: center; z-index: 2;
+  }
+  .meta-ch {
+    font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--gold);
+    letter-spacing: 4px; margin-bottom: 15px; font-weight: 700;
+  }
+  .title-ch {
+    font-size: 2.4rem; color: #fff; margin-bottom: 25px; font-weight: 900;
+  }
+  .desc-ch {
+    font-size: 1.25rem; line-height: 1.9; color: #e4dbca; max-width: 750px;
+    margin-bottom: 30px; font-weight: 300;
+  }
+  .verse-ch {
+    font-size: 1.35rem; color: var(--gold-bright); font-weight: 700;
+    border-top: 1px solid rgba(201, 168, 76, 0.2); padding-top: 20px; width: 80%;
+  }
+  .verse-ch.red { color: var(--blood-bright); text-shadow: 0 0 10px var(--blood); }
+
+  /* زر اللمس أسفل الصفحة للانتقال اليدوي */
+  .hub-gateway-btn {
+    position: absolute; bottom: 40px; z-index: 100;
+    background: transparent; border: 1px solid var(--gold); color: var(--gold-bright);
+    padding: 12px 30px; border-radius: 4px; font-size: 1rem; font-weight: 700;
+    cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s;
+  }
+  .hub-gateway-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold-bright); }
+</style>
 </head>
 <body>
 
-  <div id="particles-container"></div>
+<div id="particles"></div>
 
-  <button class="skip-story-btn" onclick="goToHub()">🏛️ دخول المنظومة مباشرة</button>
+<div class="hiero-fly" style="left:8%; animation-delay:0s;">𓂀</div>
+<div class="hiero-fly" style="left:25%; animation-delay:5s;">𓋹</div>
+<div class="hiero-fly" style="left:50%; animation-delay:10s;">𓆣</div>
+<div class="hiero-fly" style="left:75%; animation-delay:15s;">𓁈</div>
 
-  <div class="story-wrapper">
+<div id="intro">
+  <div class="intro-eye">
+    <img src="1000097151.png" alt="Eye of Ra">
+  </div>
+  <div class="intro-title">MDm1</div>
+</div>
+
+<div class="scroll-cinema-track">
+  <div class="cinema-sticky-viewport">
     
-    <section class="scene hero-scene">
-      <div class="eye-monument">👁️</div>
-      <h1 class="main-epic-title">MDm1</h1>
-      <p class="epic-subtitle">صراع الأزل والسيادة الرقمية</p>
-      <div class="scroll-indicator">مرر لأسفل لتبدأ الحكاية ↓</div>
-    </section>
-
-    <section class="scene chapter-scene" id="sec-ch1">
-      <div class="story-visual">🦅🔱👁️</div>
-      <div class="narrative-box">
-        <span class="ch-meta">الفصل الأول</span>
-        <h2 class="ch-title">الوريث والعهد القديم</h2>
-        <p class="ch-desc">من قلب الأرض الطيبة، حيث تلتقي الأسرار القديمة بالسموات، ينبثق العهد. لم يكن مجرد إرث طين وحجر، بل أمانة نورانية تتناقلها الأجيال عبر الأزل لحفظ التوازن وحماية السيادة الفكرية والمالية.</p>
-        <div class="holy-verse">«إِنِّي جَاعِلٌ فِي الْأَرْضِ خَلِيفَةً»</div>
+    <div class="cinema-frame active-frame" id="ch1">
+      <img src="1000097566.png" alt="الفصل الأول">
+      <div class="narrative-overlay">
+        <div class="meta-ch">CHAPTER I</div>
+        <h2 class="title-ch">الوريث والعهد القديم</h2>
+        <p class="desc-ch">من قلب الأرض الطيبة، حيث تلتقي الأسرار القديمة بالسموات، ينبثق العهد. لم يكن مجرد إرث طين وحجر، بل أمانة نورانية تتناقلها الأجيال عبر الأزل لحفظ التوازن وحماية السيادة الفكرية والمالية.</p>
+        <div class="verse-ch">«إِنِّي جَاعِلٌ فِي الْأَرْضِ خَلِيفَةً»</div>
       </div>
-    </section>
+    </div>
 
-    <section class="scene chapter-scene dark-phase" id="sec-ch2">
-      <div class="story-visual glitch-effect">🎭⛓️</div>
-      <div class="narrative-box">
-        <span class="ch-meta">الفصل الثاني</span>
-        <h2 class="ch-title">المضلل وظلمات الوهم</h2>
-        <p class="ch-desc">لكن النور دائماً ما يواجه الحجاب. يظهر المضلل بوعوده البراقة وأنظمته المركزية التي تستعبد العقول وتصادر حرية الأمة المالية. يبث الوهم في القلوب ليطمس البصيرة ويفرض القيود.</p>
-        <div class="holy-verse red-ignite">«زُيِّنَ لَهُمْ سُوءُ أَعْمَالِهِمْ»</div>
+    <div class="cinema-frame" id="ch2">
+      <img src="1000097472.png" alt="الفصل الثاني">
+      <div class="narrative-overlay">
+        <div class="meta-ch">CHAPTER II</div>
+        <h2 class="title-ch">المضلل وظلمات الوهم</h2>
+        <p class="desc-ch">لكن النور دائماً ما يواجه الحجاب. يظهر المضلل بوعوده البراقة وأنظمته المركزية التي تستعبد العقول وتصادر حرية الأمة المالية. يبث الوهم في القلوب ليطمس البصيرة ويفرض القيود.</p>
+        <div class="verse-ch">«زُيِّنَ لَهُمْ سُوءُ أَعْمَالِهِمْ»</div>
       </div>
-    </section>
+    </div>
 
-    <section class="scene chapter-scene" id="sec-ch3">
-      <div class="story-visual pulse-heart">❤️👁️</div>
-      <div class="narrative-box">
-        <span class="ch-meta">الفصل الثالث</span>
-        <h2 class="ch-title">المفترق واليقظة</h2>
-        <p class="ch-desc">هنا يقف الوريث عند نقطة التحول الحاسم. تتصادم الأفكار وتتحرر الإرادة؛ فإما الخنوع لمركزيّة المضلل أو النهوض لبناء نظام سياديّ حر يعيد الحقوق لأصحابها بقوة الشفرة واليقين.</p>
-        <div class="holy-verse">«وَهَدَيْنَاهُ النَّجْدَيْنِ»</div>
+    <div class="cinema-frame no-img" id="ch3">
+      <div class="narrative-overlay">
+        <div class="meta-ch">CHAPTER III</div>
+        <h2 class="title-ch">المفترق واليقظة</h2>
+        <p class="desc-ch">هنا يقف الوريث عند نقطة التحول الحاسم. تتصادم الأفكار وتتحرر الإرادة؛ فإما الخنوع لمركزيّة المضلل أو النهوض لبناء نظام سياديّ حر يعيد الحقوق لأصحابها بقوة الشفرة واليقين.</p>
+        <div class="verse-ch">«وَهَدَيْنَاهُ النَّجْدَيْنِ»</div>
       </div>
-    </section>
+    </div>
 
-    <section class="scene chapter-scene" id="sec-ch4">
-      <div class="story-visual clash-energy">⚔️🔥</div>
-      <div class="narrative-box">
-        <span class="ch-meta">الفصل الرابع</span>
-        <h2 class="ch-title">الصراع المقدس والبيان</h2>
-        <p class="ch-desc">لم يعد الصراع خفياً، بل أصبح معركة علنية بين الشفافية المطلقة والسرية الممنهجة. تُشهر الرموز الرقمية واللوغاريتمات كأسلحة عادلة لحماية الثروات من التضخم والاستنزاف.</p>
-        <div class="holy-verse divine-glow">«بَلْ نَقْذِفُ بِالْحَقِّ عَلَى الْبَاطِلِ فَيَدْمَغُهُ»</div>
+    <div class="cinema-frame" id="ch4">
+      <img src="1000097156.png" alt="الفصل الرابع">
+      <div class="narrative-overlay">
+        <div class="meta-ch">CHAPTER IV</div>
+        <h2 class="title-ch">الصراع المقدس والبيان</h2>
+        <p class="desc-ch">لم يعد الصراع خفياً، بل أصبح معركة علنية بين الشفافية المطلقة والسرية الممنهجة. تُشهر الرموز الرقمية واللوغاريتمات كأسلحة عادلة لحماية الثروات من التضخم والاستنزاف.</p>
+        <div class="verse-ch">«بَلْ نَقْذِفُ بِالْحَقِّ عَلَى الْبَاطِلِ فَيَدْمَغُهُ»</div>
       </div>
-    </section>
+    </div>
 
-    <section class="scene chapter-scene" id="sec-ch5">
-      <div class="story-visual fusion-core">📐🌐</div>
-      <div class="narrative-box">
-        <span class="ch-meta">الفصل الخامس</span>
-        <h2 class="ch-title">الجسر الكوني: الهرم والبلوكتشين</h2>
-        <p class="ch-desc">تتلاقى هندسة الأجداد المعمارية الخالدة مع هندسة الكتل البرمجية الحديثة. البلوكتشين ليس مجرد تكنولوجيا، بل هو الأثر الحسابي الذي لا يقبل التزوير، تماماً كأحجار الهرم العتيقة التي قهرت الزمن.</p>
-        <div class="holy-verse">«وَأَوْفُوا الْكَيْلَ وَالْمِيزَانَ بِالْقِسْطِ»</div>
+    <div class="cinema-frame" id="ch5">
+      <img src="1000097152.png" alt="الفصل الخامس">
+      <div class="narrative-overlay">
+        <div class="meta-ch">CHAPTER V</div>
+        <h2 class="title-ch">الجسر الكوني: الهرم والبلوكتشين</h2>
+        <p class="desc-ch">تتلاقى هندسة الأجداد المعمارية الخالدة مع هندسة الكتل البرمجية الحديثة. البلوكتشين ليس مجرد تكنولوجيا، بل هو الأثر الحسابي الذي لا يقبل التزوير، تماماً كأحجار الهرم العتيقة التي قهرت الزمن.</p>
+        <div class="verse-ch">«وَأَوْفُوا الْكَيْلَ وَالْمِيزَانَ بِالْقِسْطِ»</div>
       </div>
-    </section>
+    </div>
 
-    <section class="scene chapter-scene final-gateway" id="sec-ch6">
-      <div class="story-visual golden-burst">🌅💎</div>
-      <div class="narrative-box">
-        <span class="ch-meta">الخاتمة</span>
-        <h2 class="ch-title">السيادة المطلقة وبزوغ الفجر</h2>
-        <p class="ch-desc">ينتهي زمن الوهم، ويتجسد الحق في بروتوكول سيادي كامل ومستقل يحمي كرامة الأمة المالية وينطلق بها نحو آفاق المستقبل اللامركزي. مرحباً بك في أرض الأمان والاستقرار الحقيقي.</p>
-        <div class="holy-verse">«أَلَيْسَ الصُّبْحُ بِقَرِيبٍ»</div>
-        <button class="activate-hub-btn" onclick="goToHub()">⚡ فتح المنظومة المالية الآن</button>
+    <div class="cinema-frame no-img" id="ch6">
+      <div class="narrative-overlay">
+        <div class="meta-ch">EPILOGUE</div>
+        <h2 class="title-ch">السيادة المطلقة وبزوغ الفجر</h2>
+        <p class="desc-ch">ينتهي زمن الوهم، ويتجسد الحق في بروتوكول سيادي كامل ومستقل يحمي كرامة الأمة المالية وينطلق بها نحو آفاق المستقبل اللامركزي. مرحباً بك في أرض الأمان والاستقرار الحقيقي.</p>
+        <div class="verse-ch">«أَلَيْسَ الصُّبْحُ بِقَرِيبٍ»</div>
+        <button class="hub-gateway-btn" onclick="window.location.href='hub.html'">🏛️ العبور إلى المنظومة المالية</button>
       </div>
-    </section>
+    </div>
 
   </div>
+</div>
 
-  <section class="interactive-hub-panel" id="globalHub">
-    <div class="hub-inner-content">
-      
-      <div class="hub-main-header">
-        <div class="hub-logo">⚜️ MDM1 ⚜️</div>
-        <h2>MDM1 Global Hub</h2>
-        <p>المنظومة المالية السيادية المتوافقة مع الشريعة الإسلامية على شبكة Polygon</p>
-      </div>
+<script>
+  // 1. إخفاء الانترو تلقائياً
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => { document.getElementById('intro').classList.add('gone'); }, 4000);
+  });
 
-      <div class="hub-features-grid">
+  // 2. توليد جزيئات الغبار الذهبية
+  const pc = document.getElementById('particles');
+  for(let i=0; i<55; i++) {
+    let d = document.createElement('div');
+    d.className = 'p';
+    let s = Math.random()*3+1;
+    d.style.width = s+'px'; d.style.height = s+'px';
+    d.style.left = Math.random()*100+'vw';
+    d.style.animationDuration = (Math.random()*12+8)+'s';
+    d.style.animationDelay = (Math.random()*6)+'s';
+    pc.appendChild(d);
+  }
+
+  // 3. 🎬 محرك التحكم الذكي بالفصول الورقية والصور مع السكرول 🎬
+  const track = document.querySelector('.scroll-cinema-track');
+  const frames = [
+    document.getElementById('ch1'),
+    document.getElementById('ch2'),
+    document.getElementById('ch3'),
+    document.getElementById('ch4'),
+    document.getElementById('ch5'),
+    document.getElementById('ch6')
+  ];
+
+  window.addEventListener('scroll', () => {
+    const trackTop = track.offsetTop;
+    const trackHeight = track.offsetHeight;
+    const windowHeight = window.innerHeight;
+    const scrollTop = window.scrollY;
+
+    let progress = (scrollTop - trackTop) / (trackHeight - windowHeight);
+    if (progress < 0) progress = 0;
+    if (progress > 1) progress = 1;
+
+    let currentFrameIndex = Math.floor(progress * frames.length);
+    if (currentFrameIndex >= frames.length) currentFrameIndex = frames.length - 1;
+
+    frames.forEach((frame, index) => {
+      if (index === currentFrameIndex) {
+        frame.classList.add('active-frame');
         
-        <div class="feature-card project-token-card">
-          <div class="card-badge">LIVE</div>
-          <div class="icon-frame">🪙</div>
-          <h3>عقد توكن MDM1</h3>
-          <p>إجمالي المعروض ثابت ومقدس: 111,000,000 توكن غير قابل للتضخم، مع آلية حرق ذكية وضريبة سيادية بنسبة 5% لتعزيز السيولة والأمان.</p>
-          <div class="address-copy-container">
-            <span id="tokenAddress">0x...قريباً عند الإطلاق المعتمد</span>
-            <button class="btn-copy-action" onclick="copyTokenAddress()">نسخ العقد</button>
-          </div>
-          <div class="live-price-status">💰 حالة التوكن: جاهز للتفعيل وضخ السيولة</div>
-        </div>
+        // تأثير تكبير بطيء وتفاعلي جداً للصور أثناء السكرول المستمر
+        let localProgress = (progress * frames.length) - index;
+        let img = frame.querySelector('img');
+        if (img) {
+          img.style.transform = `scale(${1 + (localProgress * 0.08)})`;
+        }
+      } else {
+        frame.classList.remove('active-frame');
+      }
+    });
+  });
 
-        <div class="feature-card">
-          <div class="icon-frame">⚡</div>
-          <h3>السيادة اللامركزية</h3>
-          <p>بنية تحتية مشفرة بالكامل تحمي أصولك بعيداً عن مقصلة المنصات المركزية وقرارات الحظر الجائرة. تحكم مطلق بمفاتيحك الخاصة.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="icon-frame">📜</div>
-          <h3>التوافق الشرعي الكامل</h3>
-          <p>قواعد مبنية على الاقتصاد الحقيقي وأصول ثابتة، خالية تماماً من شبهات الربا، الغرر، أو آليات الاستنزاف المالي الغربي الملتوي.</p>
-        </div>
-
-      </div>
-
-      <div class="hub-navigation-grid">
-        <a href="https://mdm1.org/game" class="nav-anchor primary-gold-anchor" target="_blank">🎮 العب واربح MDM1</a>
-        <a href="https://quickswap.exchange" class="nav-anchor outline-anchor" target="_blank">🦄 تداول عبر QuickSwap</a>
-        <a href="https://uniswap.org" class="nav-anchor outline-anchor" target="_blank">🪐 تداول عبر UniSwap</a>
-        <button class="nav-anchor outline-anchor" onclick="replayMovie()">🎬 إعادة مشاهدة الفيلم التفاعلي</button>
-      </div>
-
-    </div>
-  </section>
-
-  <script src="js/animations.js"></script>
+  // 4. الانتقال التلقائي الذكي لصفحة hub.html عند سحب الخاتمة الأخيرة لأعلى (للهواتف والماوس)
+  window.addEventListener('wheel', (e) => {
+    const rect = document.getElementById('ch6').getBoundingClientRect();
+    if (rect.bottom <= window.innerHeight + 10 && e.deltaY > 30) {
+      window.location.href = "hub.html";
+    }
+  });
+</script>
 </body>
 </html>
