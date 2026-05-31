@@ -707,13 +707,33 @@
       <div class="sym"><span class="icon" style="font-size:1.5rem;">🔺</span><span class="name">الهرم</span></div>
       <div class="sym"><span class="icon" style="font-size:1.5rem;">🦅</span><span class="name">رع</span></div>
     </div>
-    <p style="margin-top:3rem; font-size:.75rem; opacity:.3; letter-spacing:2px;">
-      👇👇 إسحب بقوة نحو الأسفل 👇👇
-      👇👇 إنها فقط البداية و النهاية مكتوبة قبلها 👇👇 
-      🚀🛬 we r coming 4 u special order 👻👹
-    </p>
+    <!-- ✦ زر الانتقال للورقة البيضاء ✦ -->
+    <div style="margin-top:3rem; text-align:center;">
+      <p style="font-size:.85rem; opacity:.5; letter-spacing:3px; margin-bottom:1.5rem; color:var(--gold);">
+        ✦ &nbsp; الرحلة لم تنتهِ &nbsp; ✦
+      </p>
+      <a href="whitepaper.html" class="cta-btn" id="wp-btn">
+        📄 &nbsp; الورقة البيضاء
+      </a>
+      <p style="margin-top:1.2rem; font-size:.75rem; opacity:.35; letter-spacing:2px;">
+        أو اسحب للأسفل للانتقال التلقائي
+      </p>
+    </div>
   </div>
 </section>
+
+<!-- ── TRANSITION OVERLAY ── -->
+<div id="transition-overlay" style="
+  position:fixed; inset:0; z-index:9999;
+  background:#000;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.6s ease;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:1rem;
+">
+  <div style="font-size:3rem; animation:pulse 1s ease-in-out infinite;">📄</div>
+  <div style="font-family:'Cinzel',serif; color:var(--gold); letter-spacing:4px; font-size:1rem;">الورقة البيضاء</div>
+</div>
 
 <script>
 // ── PARTICLES ──
@@ -747,32 +767,53 @@ setTimeout(() => {
   window.scrollTo({ top: 1, behavior: 'smooth' });
 }, 5200);
 
-// ── 🌟 كود التمرير الذكي الجديد للانتقال إلى HUB.HTML 🌟 ──
+// ── NAVIGATE TO WHITEPAPER WITH SMOOTH OVERLAY ──
+function goToWhitepaper() {
+  const overlay = document.getElementById('transition-overlay');
+  overlay.style.opacity = '1';
+  overlay.style.pointerEvents = 'all';
+  setTimeout(() => { window.location.href = 'whitepaper.html'; }, 700);
+}
+
+// زر الانتقال المباشر
+document.getElementById('wp-btn').addEventListener('click', (e) => {
+  e.preventDefault();
+  goToWhitepaper();
+});
+
+// ── الانتقال بالسحب — خفيف وسريع ──
 const lastSection = document.getElementById('ch6');
+let canTransition = false;
+let wheelAccum = 0;
 
-// 1. للهواتف (عبر اللمس)
-let touchStartPos = 0;
-window.addEventListener('touchstart', (e) => {
-  touchStartPos = e.touches[0].clientY;
-}, { passive: true });
+// تفعيل الانتقال فقط عندما نصل لنهاية الصفحة فعلاً
+function checkAtBottom() {
+  const scrolled = window.scrollY + window.innerHeight;
+  const total = document.documentElement.scrollHeight;
+  canTransition = (scrolled >= total - 80);
+}
+window.addEventListener('scroll', checkAtBottom, { passive: true });
 
-window.addEventListener('touchmove', (e) => {
-  const touchEndPos = e.touches[0].clientY;
-  const rect = lastSection.getBoundingClientRect();
-  
-  // إذا كانت الخاتمة ظاهرة على الشاشة وقام المستخدم بالسحب لأعلى ليفتح ما بعدها
-  if (rect.bottom <= window.innerHeight + 50 && touchStartPos > touchEndPos + 35) {
-    window.location.href = "hub.html";
-  }
-}, { passive: true });
-
-// 2. للكمبيوتر (عبر عجلة الماوس)
+// الكمبيوتر — سحبة واحدة كافية عند نهاية الصفحة
 window.addEventListener('wheel', (e) => {
-  const rect = lastSection.getBoundingClientRect();
-  // إذا وصلنا لنهاية الخاتمة وحرك الماوس لأسفل
-  if (rect.bottom <= window.innerHeight + 50 && e.deltaY > 0) {
-    window.location.href = "hub.html";
+  if (!canTransition || e.deltaY <= 0) { wheelAccum = 0; return; }
+  wheelAccum += e.deltaY;
+  if (wheelAccum > 80) {
+    wheelAccum = 0;
+    goToWhitepaper();
   }
+}, { passive: true });
+
+// الهاتف — سحبة واحدة كافية
+let touchStartY = 0;
+window.addEventListener('touchstart', (e) => {
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+window.addEventListener('touchend', (e) => {
+  if (!canTransition) return;
+  const diff = touchStartY - e.changedTouches[0].clientY;
+  if (diff > 40) goToWhitepaper();
 }, { passive: true });
 </script>
 </body>
